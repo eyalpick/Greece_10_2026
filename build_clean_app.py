@@ -235,7 +235,7 @@ for i, row in enumerate(df):
         focus_html = f'<div class="weather-focus" style="margin-top:10px; padding:10px; background:rgba(168, 85, 247, 0.2); border-radius:6px;"><strong>דגש יומי והמלצות:</strong> {w_data["focus"]}</div>' if w_data.get("focus") else '<div class="weather-focus" style="margin-top:10px; padding:10px; background:rgba(168, 85, 247, 0.2); border-radius:6px; display:none;"></div>'
         
         html += f'''
-            <div class="info-block weather-block weather-widget" data-date="{date_int}.10">
+            <div class="info-block weather-block weather-widget" data-date="{date_int}.10" data-daynum="{day_num}">
                 <h4><i class="fa-solid fa-cloud-sun"></i> תחזית מזג אוויר</h4>
                 <div style="font-size:1.1rem;">
                     <p class="w-summary"><strong>מזג אוויר:</strong> {w_data["summary"]}</p>
@@ -247,7 +247,7 @@ for i, row in enumerate(df):
         '''
     else:
         html += f'''
-            <div class="info-block weather-block weather-widget" data-date="{date_int}.10">
+            <div class="info-block weather-block weather-widget" data-date="{date_int}.10" data-daynum="{day_num}">
                 <h4><i class="fa-solid fa-cloud-sun"></i> תחזית מזג אוויר</h4>
                 <div style="font-size:1.1rem;">
                     <p class="w-summary">אין מידע זמין כרגע.</p>
@@ -297,14 +297,87 @@ html += """
     </div>
     
     <script>
+    function getSmartFocus(dayNum, w) {
+        let focus = [];
+        
+        if (w.rainProb >= 50 || w.rainSum > 3) {
+            focus.push("יום גשום! חובה להצטייד במעיל גשם וכיסוי לתרמיל.");
+        } else if (w.rainProb >= 20) {
+            focus.push("ייתכן ממטר מקומי. כדאי להחזיק ציוד גשם נגיש.");
+        }
+        
+        if (w.rainProb >= 30 || w.rainSum > 1) {
+            focus.push("מומלץ ליציאה מוקדמת כדי להימנע מממטרי אחר הצהריים.");
+        }
+        
+        if (w.wind > 35) {
+            focus.push("רוחות חזקות צפויות ברכסים. מומלץ להצטייד במעיל רוח.");
+        }
+        if (w.maxT < 14) {
+            focus.push("תנאים קרים מהרגיל. מומלץ לבוש חם בשיטת הבצל.");
+        } else if (w.maxT >= 25) {
+            focus.push("יום חם. להקפיד על שתייה מרובה וקרם הגנה.");
+        }
+
+        // Trail specific rules based on day_num
+        // dayNum 2 = 14.10 (Stemnitsa -> Dimitsana)
+        if (dayNum === 2 && w.rainProb >= 20) {
+            focus.push("<br>⚠️ <strong>דגש בטיחות למקטע:</strong> סלעים ומדרגות חלקות בקניון לוסיוס (Lousios) בעת רטיבות! נדרשת הליכה זהירה מאוד.");
+        }
+        // dayNum 3 = 15.10 (Dimitsana/Zygovisti -> Elati)
+        if (dayNum === 3 && (w.wind > 20 || w.maxT < 15)) {
+            focus.push("<br>⚠️ <strong>דגש בטיחות למקטע:</strong> צפוי קור ורוחות במעברי הרכס הגבוהים (זיוגוביסטי - 1,550 מ'). חובה להצטייד במגן רוח וחימום לפני החצייה.");
+        }
+
+        if (focus.length === 0) {
+            focus.push("תנאים מצוינים ויבשים להליכה. מזג אוויר אידיאלי למסלול.");
+        }
+        return focus.join(" ");
+    }
+
+    function renderWeather(weatherData, lastUpdated) {
+        document.querySelectorAll('.weather-widget').forEach(el => {
+            const dateAttr = el.getAttribute('data-date');
+            const dayNum = parseInt(el.getAttribute('data-daynum'));
+            
+            if(weatherData[dateAttr]) {
+                const w = weatherData[dateAttr];
+                const focusText = getSmartFocus(dayNum, w);
+                
+                el.querySelector('.w-summary').innerHTML = `<strong>מזג אוויר:</strong> ${w.summary}`;
+                el.querySelector('.w-temp').innerHTML = `<strong>טמפרטורות:</strong> ביום ${w.maxT}°C | בלילה ${w.minT}°C`;
+                el.querySelector('.w-rain').innerHTML = `<strong>סיכוי למשקעים:</strong> ${w.rainProb}%`;
+                
+                const focusEl = el.querySelector('.weather-focus');
+                focusEl.style.display = 'block';
+                focusEl.innerHTML = `<strong>דגש יומי והמלצות:</strong> ${focusText}`;
+                
+                // Add timestamp if available
+                if (lastUpdated) {
+                    let tsEl = el.querySelector('.w-timestamp');
+                    if (!tsEl) {
+                        tsEl = document.createElement('div');
+                        tsEl.className = 'w-timestamp';
+                        tsEl.style.fontSize = '0.85rem';
+                        tsEl.style.color = 'var(--text-muted)';
+                        tsEl.style.marginTop = '8px';
+                        el.appendChild(tsEl);
+                    }
+                    const d = new Date(lastUpdated);
+                    tsEl.innerHTML = `<i class="fa-solid fa-clock-rotate-left"></i> עודכן לאחרונה: ${d.toLocaleDateString('he-IL')} בשעה ${d.toLocaleTimeString('he-IL', {hour: '2-digit', minute:'2-digit'})}`;
+                }
+            }
+        });
+    }
+
     async function fetchSmartWeather() {
         const btn = document.getElementById('weather-update-btn');
-        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> מתחבר ללוויין ומנתח נתונים...';
+        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> סורק מקורות מטאורולוגיים...';
         btn.disabled = true;
 
         try {
-            // Fetch 16-day forecast for Menalon area
-            const response = await fetch("https://api.open-meteo.com/v1/forecast?latitude=37.595&longitude=22.04&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max,precipitation_sum,wind_speed_10m_max&timezone=auto&forecast_days=16");
+            // Using elevation=1000 for Arcadia mountains to get accurate cold/wind models
+            const response = await fetch("https://api.open-meteo.com/v1/forecast?latitude=37.595&longitude=22.04&elevation=1000&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max,precipitation_sum,wind_speed_10m_max&timezone=auto&forecast_days=16");
             const data = await response.json();
             
             const weatherMap = {};
@@ -321,48 +394,24 @@ html += """
                 const wind = data.daily.wind_speed_10m_max[i];
                 const code = data.daily.weather_code[i];
                 
-                // Smart Summary
                 let summary = "שמשי ויבש, תנאים נוחים";
                 if(code >= 1 && code <= 3) summary = "עננות חלקית, שילוב של שמש ועננים";
                 if(code >= 45 && code <= 48) summary = "ערפילי (בעיקר בבוקר)";
-                if(code >= 51 && code <= 67) summary = "מעונן עם גשם קל עד בינוני בחלק משעות היום";
+                if(code >= 51 && code <= 67) summary = "מעונן עם גשם קל עד בינוני";
                 if(code >= 80 && code <= 82) summary = "גשם שוטף / ממטרים חזקים";
                 if(code >= 95) summary = "סופות רעמים וגשם";
                 
-                // Smart Focus (Recommendations exactly like Gemini)
-                let focus = "תנאים מצוינים ויבשים להליכה. מזג אוויר אידיאלי למסלול."; 
-                if (rainProb >= 50 || rainSum > 3) {
-                    focus = "יום גשום! חובה להצטייד במעיל גשם, כיסוי לתרמיל והליכה זהירה במדרונות חלקים. מומלץ לשקול שעת יציאה בבוקר בהתאם למכ\\"ם פתוח.";
-                } else if (rainProb >= 20) {
-                    focus = "ייתכן ממטר מקומי קל אחה\\"צ. מומלץ להחזיק ציוד גשם נגיש בתיק למקרה הצורך, אך רוב היום צפוי להיות נוח.";
-                } else if (wind > 35) {
-                    focus = "תנאים יבשים אך צפויות רוחות ערות ברכסים הגבוהים. מומלץ להצטייד במעיל רוח לחציית האוכף.";
-                } else if (maxT < 14) {
-                    focus = "תנאים קרים. מומלץ לבוש חם בשכבות (שיטת הבצל) ולצאת מוקדם כדי לנצל את שעות השמש.";
-                } else if (maxT >= 25) {
-                    focus = "יום חם מהרגיל. יש להקפיד על שתייה מרובה (לפחות 3 ליטר) וקרם הגנה. עדיף לצאת מוקדם.";
-                } else if (code <= 3 && rainProb < 10) {
-                    focus = "תנאים מצוינים ויבשים לחציית קניונים ועלייה לרכסים. מזג אוויר אידיאלי.";
-                }
-
-                weatherMap[`${day}.${month}`] = { maxT, minT, rainProb, summary, focus };
+                weatherMap[`${day}.${month}`] = { maxT, minT, rainProb, rainSum, wind, summary };
             }
 
-            document.querySelectorAll('.weather-widget').forEach(el => {
-                const dateAttr = el.getAttribute('data-date');
-                if(weatherMap[dateAttr]) {
-                    const w = weatherMap[dateAttr];
-                    el.querySelector('.w-summary').innerHTML = `<strong>מזג אוויר:</strong> ${w.summary}`;
-                    el.querySelector('.w-temp').innerHTML = `<strong>טמפרטורות:</strong> ביום ${w.maxT}°C | בלילה ${w.minT}°C`;
-                    el.querySelector('.w-rain').innerHTML = `<strong>סיכוי למשקעים:</strong> ${w.rainProb}%`;
-                    
-                    const focusEl = el.querySelector('.weather-focus');
-                    focusEl.style.display = 'block';
-                    focusEl.innerHTML = `<strong>דגש יומי והמלצות:</strong> ${w.focus}`;
-                }
-            });
+            // Save to localStorage
+            const now = new Date().getTime();
+            localStorage.setItem('menalon_weather', JSON.stringify(weatherMap));
+            localStorage.setItem('menalon_weather_time', now);
+            
+            renderWeather(weatherMap, now);
 
-            btn.innerHTML = '<i class="fa-solid fa-check"></i> התחזית החכמה עודכנה!';
+            btn.innerHTML = '<i class="fa-solid fa-check"></i> התחזית וההמלצות עודכנו בהצלחה!';
             setTimeout(() => {
                 btn.innerHTML = '<i class="fa-solid fa-cloud-sun"></i> עדכן תחזית חכמה עכשיו';
                 btn.disabled = false;
@@ -377,6 +426,17 @@ html += """
             }, 4000);
         }
     }
+
+    // Load saved weather on startup
+    window.addEventListener('DOMContentLoaded', () => {
+        const savedWeather = localStorage.getItem('menalon_weather');
+        const savedTime = localStorage.getItem('menalon_weather_time');
+        if (savedWeather) {
+            try {
+                renderWeather(JSON.parse(savedWeather), parseInt(savedTime));
+            } catch(e) {}
+        }
+    });
     </script>
 </body>
 </html>
