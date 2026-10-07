@@ -3,17 +3,24 @@ import codecs
 import re
 from guide_text import GUIDE_TEXT
 
-# Parse the guide text into a dictionary mapped by PDF day_num
-parts = re.split(r'\n(?=יום \d+ \|)', GUIDE_TEXT.strip())
-day_texts = {}
-for p in parts:
-    p = p.strip()
-    if p.startswith('יום '):
-        num = int(re.search(r'יום (\d+)', p).group(1))
-        lines = p.split('\n')
-        # Skip the first line (title)
+MANUAL_WEATHER = {
+    13: "שמש ברובה, יבש. 19°C ביום | 9°C בלילה | 1% סיכוי למשקעים.",
+    14: "שמש ברובה, תנאים נוחים ויבשים. 19°C ביום | 9°C בלילה | 0% סיכוי למשקעים.",
+    15: "שמש ועננות, ייתכן ממטר קל אחה\"צ. 18°C ביום | 9°C בלילה | 49% סיכוי למשקעים.",
+    16: "מעונן עם גשם (זהירות מהחלקה). 18°C ביום | 8°C בלילה | 60% סיכוי למשקעים.",
+    17: "התבהרות מהירה, שמש ועננות חלקית. 17°C ביום | 8°C בלילה | 1% סיכוי למשקעים.",
+    18: "מעונן ברובו עם פרקי שמש, סיכוי לטפטוף. 18°C ביום | 9°C בלילה | 25% סיכוי למשקעים."
+}
+
+def get_pdf_text_for_day(day_num):
+    pattern = fr"יום {day_num} \|.*?(?=(יום \d+ \|)|$)"
+    match = re.search(pattern, GUIDE_TEXT, re.DOTALL | re.MULTILINE)
+    if match:
+        text = match.group(0).strip()
+        lines = text.split('\n')
         content = '<br>'.join(lines[1:]).strip()
-        day_texts[num] = content
+        return content
+    return ""
 
 with open(r'C:\Users\Eyal Pick\.gemini\antigravity\brain\4dd4cf76-c8a9-4f41-a9e9-14b74fb877a7\scratch\menalon.json', 'r', encoding='utf-8') as f:
     df = json.load(f)
@@ -50,7 +57,7 @@ html = """<!DOCTYPE html>
             min-height: 100vh;
             line-height: 1.6;
             padding-bottom: 3rem;
-            font-size: 16px;
+            font-size: 19px; /* Increased font size for better readability */
         }
         .dashboard-container { max-width: 1200px; margin: 0 auto; padding: 2rem 1.5rem; }
         .header-card {
@@ -62,27 +69,30 @@ html = """<!DOCTYPE html>
             margin-bottom: 2rem;
             box-shadow: 0 0 20px 2px rgba(249, 115, 22, 0.15);
         }
-        .header-card h1 { font-family: 'Outfit', sans-serif; font-size: 2.5rem; margin-bottom: 0.5rem; color: #fff; }
-        .header-card p { color: var(--accent-orange); font-size: 1.2rem; font-weight: 500; }
+        .header-card h1 { font-family: 'Outfit', sans-serif; font-size: 2.8rem; margin-bottom: 0.5rem; color: #fff; }
+        .header-card p { color: var(--accent-orange); font-size: 1.3rem; font-weight: 500; }
         .card {
             background: var(--bg-card);
             border: 1px solid var(--border-card);
             border-radius: var(--radius-md);
             padding: 1.5rem;
-            margin-bottom: 1.5rem;
+            margin-bottom: 2rem;
         }
-        .card-header h2 { font-size: 1.5rem; color: var(--accent-orange); margin-bottom: 0.5rem; }
-        .card-header p.stats { color: var(--text-secondary); font-size: 0.95rem; margin-bottom: 1rem; border-bottom: 1px solid var(--border-card); padding-bottom: 1rem; }
+        .card-header h2 { font-size: 1.7rem; color: var(--accent-orange); margin-bottom: 0.5rem; }
+        .card-header p.stats { color: var(--text-secondary); font-size: 1.1rem; margin-bottom: 1rem; border-bottom: 1px solid var(--border-card); padding-bottom: 1rem; }
         
         .info-block {
             background: rgba(0,0,0,0.2);
             padding: 1.5rem;
             border-radius: 8px;
-            margin-bottom: 1rem;
-            border-right: 3px solid var(--accent-blue);
+            margin-bottom: 1.25rem;
+            border-right: 4px solid var(--accent-blue);
         }
-        .info-block h4 { color: var(--accent-blue); margin-bottom: 0.75rem; font-size: 1.2rem; }
-        .info-block p { color: var(--text-secondary); font-size: 1rem; line-height: 1.8; }
+        .info-block h4 { color: var(--accent-blue); margin-bottom: 0.75rem; font-size: 1.3rem; }
+        .info-block p { color: var(--text-primary); font-size: 1.1rem; line-height: 1.8; }
+        
+        .weather-block { border-right-color: #a855f7; }
+        .weather-block h4 { color: #a855f7; }
         
         .eats-block { border-right-color: var(--accent-green); }
         .eats-block h4 { color: var(--accent-green); }
@@ -94,18 +104,28 @@ html = """<!DOCTYPE html>
         .docs-list li a {
             display: inline-block;
             background: rgba(255,255,255,0.05);
-            padding: 0.75rem 1.25rem;
+            padding: 1rem 1.5rem;
             border-radius: 8px;
             color: #fff;
             text-decoration: none;
             border: 1px solid var(--border-card);
             transition: 0.2s;
+            font-size: 1.1rem;
         }
         .docs-list li a:hover { background: rgba(255,255,255,0.1); border-color: var(--accent-blue); color: var(--accent-blue); }
         
-        .btn { display: inline-block; background: var(--accent-blue); color: #fff; padding: 0.5rem 1rem; border-radius: 6px; text-decoration: none; margin-top: 0.5rem; font-size: 0.9rem; }
+        .btn { display: inline-block; background: var(--accent-blue); color: #fff; padding: 0.75rem 1.25rem; border-radius: 6px; text-decoration: none; margin-top: 0.5rem; font-size: 1.05rem; }
         .btn:hover { background: #2563eb; }
-            @media (max-width: 768px) {\n            .dashboard-container { padding: 0.5rem 0.25rem; }\n            .header-card { padding: 1.25rem 0.5rem; border-radius: 8px; margin-bottom: 1rem; }\n            .header-card h1 { font-size: 1.7rem; }\n            .card { padding: 1rem 0.75rem; border-radius: 8px; margin-bottom: 1rem; }\n            .card-header h2 { font-size: 1.25rem; }\n            .info-block { padding: 1rem 0.75rem; }\n        }\n    </style>
+
+        @media (max-width: 768px) {
+            .dashboard-container { padding: 0.5rem 0.25rem; }
+            .header-card { padding: 1.25rem 0.5rem; border-radius: 8px; margin-bottom: 1rem; }
+            .header-card h1 { font-size: 1.9rem; }
+            .card { padding: 1rem 0.75rem; border-radius: 8px; margin-bottom: 1.5rem; }
+            .card-header h2 { font-size: 1.4rem; }
+            .info-block { padding: 1rem 0.75rem; }
+        }
+    </style>
 </head>
 <body>
     <div class="dashboard-container">
@@ -135,7 +155,8 @@ for i, row in enumerate(df):
     if date_val is None: continue
     
     day_num = i + 1
-    date_text = f"{int(date_val)} {month} (יום {row.get('יום בשבוע', '')})"
+    date_int = int(date_val)
+    date_text = f"{date_int} {month} (יום {row.get('יום בשבוע', '')})"
     title_he = row.get("מסלול", "יום התארגנות")
     if not title_he: title_he = "יום התארגנות"
     
@@ -167,40 +188,53 @@ for i, row in enumerate(df):
     html += f'''
         <div class="card">
             <div class="card-header">
-                <h2>יום {day_num} - {date_text} <span style="color:#fff; font-size:1.4rem; display:block; margin-top:0.5rem;">{title_he}</span></h2>
+                <h2>יום {day_num} - {date_text} <span style="color:#fff; font-size:1.6rem; display:block; margin-top:0.5rem;">{title_he}</span></h2>
                 <p class="stats">{drive_time_html}</p>
             </div>
     '''
     
-    pdf_info = day_texts.get(day_num - 1, "")
+    # 1. WEATHER (Always First)
+    static_weather = MANUAL_WEATHER.get(date_int, "אין מידע זמין.")
+    
+    html += f'''
+            <div class="info-block weather-block weather-widget" data-date="{date_int}.10">
+                <h4><i class="fa-solid fa-cloud-sun"></i> תחזית מזג אוויר</h4>
+                <p class="weather-text">{static_weather}</p>
+            </div>
+    '''
+
+    # 2. EATS (Morning provisions)
+    if eats:
+        html += f'''
+            <div class="info-block eats-block">
+                <h4><i class="fa-solid fa-utensils"></i> הצטיידות ומזון במסלול</h4>
+                <p>{eats}</p>
+            </div>
+        '''
+
+    # 3. ROUTE DESC & PDF INFO
+    pdf_info = get_pdf_text_for_day(day_num - 1)
     
     if desc or notes or pdf_info:
         desc_text = str(desc or '')
         if notes: desc_text += '<br><br><strong>הערות לטיול:</strong> ' + str(notes)
-        if pdf_info: desc_text += '<br><br><div style="background:rgba(59, 130, 246, 0.15); padding: 15px; border-radius: 8px; border-right: 3px solid #3b82f6; margin-top:10px;"><h4 style="color:#3b82f6; margin-bottom:10px;"><i class="fa-solid fa-book"></i> מדריך מנלון (פירוט מהמסמך):</h4>' + pdf_info + '</div>'
+        if pdf_info: desc_text += '<br><br><div style="background:rgba(59, 130, 246, 0.15); padding: 15px; border-radius: 8px; border-right: 3px solid #3b82f6; margin-top:10px;"><h4 style="color:#3b82f6; margin-bottom:10px; font-size: 1.15rem;"><i class="fa-solid fa-book"></i> מדריך מנלון (פירוט מהמסמך):</h4>' + pdf_info + '</div>'
         
         html += f'''
             <div class="info-block">
-                <h4><i class="fa-solid fa-map-location-dot"></i> פירוט המסלול והערות</h4>
+                <h4><i class="fa-solid fa-map-location-dot"></i> פירוט המסלול</h4>
                 <p>{desc_text}</p>
             </div>
         '''
         
-    if eats:
-        html += f'''
-            <div class="info-block eats-block">
-                <h4><i class="fa-solid fa-utensils"></i> אוכל והצטיידות</h4>
-                <p>{eats}</p>
-            </div>
-        '''
-        
+    # 4. HOTEL
     if hotel:
         maps_link = f"https://www.google.com/maps/search/?api=1&query={hotel.replace(' ', '+')}"
         html += f'''
             <div class="info-block hotel-block">
                 <h4><i class="fa-solid fa-bed"></i> מקום לינה: {hotel}</h4>
                 <p>{hotel_notes}</p>
-                <a href="{maps_link}" target="_blank" class="btn"><i class="fa-solid fa-map-pin"></i> נווט למלון ב-Google Maps</a>
+                <a href="{maps_link}" target="_blank" class="btn"><i class="fa-solid fa-map-pin"></i> נווט ל-{hotel} ב-Google Maps</a>
             </div>
         '''
         
@@ -209,6 +243,65 @@ for i, row in enumerate(df):
 html += """
         </div>
     </div>
+    
+    <!-- Dynamic Weather Script -->
+    <script>
+    async function updateWeather() {
+        try {
+            // Fetch 16-day forecast for Dimitsana area
+            const response = await fetch("https://api.open-meteo.com/v1/forecast?latitude=37.595&longitude=22.04&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max&timezone=auto&forecast_days=16");
+            const data = await response.json();
+            
+            const weatherMap = {};
+            for(let i=0; i<data.daily.time.length; i++) {
+                const dateStr = data.daily.time[i]; 
+                const d = new Date(dateStr);
+                const day = d.getDate();
+                const month = d.getMonth() + 1;
+                
+                const maxT = Math.round(data.daily.temperature_2m_max[i]);
+                const minT = Math.round(data.daily.temperature_2m_min[i]);
+                const rainProb = data.daily.precipitation_probability_max[i];
+                const code = data.daily.weather_code[i];
+                
+                let icon = "fa-sun";
+                let text = "שמשי ויבש";
+                if(code >= 1 && code <= 3) { icon = "fa-cloud-sun"; text = "מעונן חלקית"; }
+                if(code >= 45 && code <= 48) { icon = "fa-smog"; text = "ערפילי"; }
+                if(code >= 51 && code <= 67) { icon = "fa-cloud-rain"; text = "גשם קל / בינוני"; }
+                if(code >= 80 && code <= 82) { icon = "fa-cloud-showers-heavy"; text = "גשם שוטף"; }
+                if(code >= 95) { icon = "fa-bolt"; text = "סופות רעמים"; }
+                
+                weatherMap[`${day}.${month}`] = { maxT, minT, rainProb, icon, text };
+            }
+
+            // Inject live data into DOM
+            document.querySelectorAll('.weather-widget').forEach(el => {
+                const dateAttr = el.getAttribute('data-date'); // e.g. "13.10"
+                if(weatherMap[dateAttr]) {
+                    const w = weatherMap[dateAttr];
+                    const p = el.querySelector('.weather-text');
+                    p.innerHTML = `
+                        <div style="display:flex; align-items:center; gap:15px; margin-top:5px; color: #fff;">
+                            <i class="fa-solid ${w.icon} fa-2x" style="color:#a855f7;"></i>
+                            <div>
+                                <div style="font-weight:bold; font-size:1.15rem; color:#a855f7;">עדכון חי: ${w.text}</div>
+                                <div style="font-size:1rem; color: var(--text-secondary);">
+                                    ${w.maxT}°C ביום | ${w.minT}°C בלילה | סיכוי למשקעים: ${w.rainProb}%
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }
+            });
+        } catch (e) {
+            console.error("Failed to fetch live weather", e);
+            // Fallback to static data is already in HTML, so do nothing.
+        }
+    }
+    // Run live update when page loads
+    updateWeather();
+    </script>
 </body>
 </html>
 """
