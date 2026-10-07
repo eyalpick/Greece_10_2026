@@ -105,7 +105,7 @@ html = """<!DOCTYPE html>
         
         .btn { display: inline-block; background: var(--accent-blue); color: #fff; padding: 0.5rem 1rem; border-radius: 6px; text-decoration: none; margin-top: 0.5rem; font-size: 0.9rem; }
         .btn:hover { background: #2563eb; }
-    </style>
+            @media (max-width: 768px) {\n            .dashboard-container { padding: 0.5rem 0.25rem; }\n            .header-card { padding: 1.25rem 0.5rem; border-radius: 8px; margin-bottom: 1rem; }\n            .header-card h1 { font-size: 1.7rem; }\n            .card { padding: 1rem 0.75rem; border-radius: 8px; margin-bottom: 1rem; }\n            .card-header h2 { font-size: 1.25rem; }\n            .info-block { padding: 1rem 0.75rem; }\n        }\n    </style>
 </head>
 <body>
     <div class="dashboard-container">
