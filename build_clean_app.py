@@ -42,7 +42,6 @@ MANUAL_WEATHER = {
     }
 }
 
-# Parse the guide text into a dictionary mapped by PDF day_num
 parts = re.split(r'\n(?=יום \d+ \|)', GUIDE_TEXT.strip())
 day_texts = {}
 for p in parts:
@@ -50,7 +49,6 @@ for p in parts:
     if p.startswith('יום '):
         num = int(re.search(r'יום (\d+)', p).group(1))
         lines = p.split('\n')
-        # Skip the first line (title)
         content = '<br>'.join(lines[1:]).strip()
         day_texts[num] = content
 
@@ -89,7 +87,7 @@ html = """<!DOCTYPE html>
             min-height: 100vh;
             line-height: 1.6;
             padding-bottom: 3rem;
-            font-size: 19px; /* Increased font size for better readability */
+            font-size: 19px;
         }
         .dashboard-container { max-width: 1200px; margin: 0 auto; padding: 2rem 1.5rem; }
         .header-card {
@@ -146,8 +144,9 @@ html = """<!DOCTYPE html>
         }
         .docs-list li a:hover { background: rgba(255,255,255,0.1); border-color: var(--accent-blue); color: var(--accent-blue); }
         
-        .btn { display: inline-block; background: var(--accent-blue); color: #fff; padding: 0.75rem 1.25rem; border-radius: 6px; text-decoration: none; margin-top: 0.5rem; font-size: 1.05rem; }
+        .btn { display: inline-block; background: var(--accent-blue); color: #fff; padding: 0.75rem 1.25rem; border-radius: 6px; text-decoration: none; margin-top: 0.5rem; font-size: 1.05rem; cursor: pointer; border: none; font-family: 'Inter', sans-serif;}
         .btn:hover { background: #2563eb; }
+        .btn:disabled { opacity: 0.6; cursor: not-allowed; }
 
         @media (max-width: 768px) {
             .dashboard-container { padding: 0.5rem 0.25rem; }
@@ -165,6 +164,12 @@ html = """<!DOCTYPE html>
         <header class="header-card">
             <h1>יוון 2026 - Menalon Trail</h1>
             <p>13 באוקטובר - 22 באוקטובר 2026</p>
+            <div style="margin-top:1.5rem;">
+                <button id="weather-update-btn" class="btn" style="background: #a855f7;" onclick="fetchSmartWeather()">
+                    <i class="fa-solid fa-cloud-sun"></i> עדכן תחזית חכמה עכשיו
+                </button>
+                <p style="font-size:0.9rem; color:var(--text-muted); margin-top:0.5rem;">מושך נתונים עדכניים ובונה המלצות יציאה חכמות (לא צורך חבילת גלישה)</p>
+            </div>
         </header>
 
         <div class="card">
@@ -225,31 +230,34 @@ for i, row in enumerate(df):
             </div>
     '''
     
-    # 1. WEATHER (Always First) - Using EXACT user-provided rich text
     w_data = MANUAL_WEATHER.get(date_int)
     if w_data:
-        focus_html = f'<div style="margin-top:10px; padding:10px; background:rgba(168, 85, 247, 0.2); border-radius:6px;"><strong>דגש יומי:</strong> {w_data["focus"]}</div>' if w_data.get("focus") else ""
+        focus_html = f'<div class="weather-focus" style="margin-top:10px; padding:10px; background:rgba(168, 85, 247, 0.2); border-radius:6px;"><strong>דגש יומי והמלצות:</strong> {w_data["focus"]}</div>' if w_data.get("focus") else '<div class="weather-focus" style="margin-top:10px; padding:10px; background:rgba(168, 85, 247, 0.2); border-radius:6px; display:none;"></div>'
         
         html += f'''
-            <div class="info-block weather-block">
+            <div class="info-block weather-block weather-widget" data-date="{date_int}.10">
                 <h4><i class="fa-solid fa-cloud-sun"></i> תחזית מזג אוויר</h4>
                 <div style="font-size:1.1rem;">
-                    <p><strong>מזג אוויר:</strong> {w_data["summary"]}</p>
-                    <p><strong>טמפרטורות:</strong> {w_data["temp"]}</p>
-                    <p><strong>סיכוי למשקעים:</strong> {w_data["rain"]}</p>
+                    <p class="w-summary"><strong>מזג אוויר:</strong> {w_data["summary"]}</p>
+                    <p class="w-temp"><strong>טמפרטורות:</strong> {w_data["temp"]}</p>
+                    <p class="w-rain"><strong>סיכוי למשקעים:</strong> {w_data["rain"]}</p>
                     {focus_html}
                 </div>
             </div>
         '''
     else:
         html += f'''
-            <div class="info-block weather-block">
+            <div class="info-block weather-block weather-widget" data-date="{date_int}.10">
                 <h4><i class="fa-solid fa-cloud-sun"></i> תחזית מזג אוויר</h4>
-                <p>אין מידע זמין כרגע.</p>
+                <div style="font-size:1.1rem;">
+                    <p class="w-summary">אין מידע זמין כרגע.</p>
+                    <p class="w-temp"></p>
+                    <p class="w-rain"></p>
+                    <div class="weather-focus" style="margin-top:10px; padding:10px; background:rgba(168, 85, 247, 0.2); border-radius:6px; display:none;"></div>
+                </div>
             </div>
         '''
 
-    # 2. EATS (Morning provisions)
     if eats:
         html += f'''
             <div class="info-block eats-block">
@@ -258,7 +266,6 @@ for i, row in enumerate(df):
             </div>
         '''
 
-    # 3. ROUTE DESC & PDF INFO
     pdf_info = day_texts.get(day_num - 1, "")
     
     if desc or notes or pdf_info:
@@ -273,7 +280,6 @@ for i, row in enumerate(df):
             </div>
         '''
         
-    # 4. HOTEL
     if hotel:
         maps_link = f"https://www.google.com/maps/search/?api=1&query={hotel.replace(' ', '+')}"
         html += f'''
@@ -289,6 +295,89 @@ for i, row in enumerate(df):
 html += """
         </div>
     </div>
+    
+    <script>
+    async function fetchSmartWeather() {
+        const btn = document.getElementById('weather-update-btn');
+        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> מתחבר ללוויין ומנתח נתונים...';
+        btn.disabled = true;
+
+        try {
+            // Fetch 16-day forecast for Menalon area
+            const response = await fetch("https://api.open-meteo.com/v1/forecast?latitude=37.595&longitude=22.04&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max,precipitation_sum,wind_speed_10m_max&timezone=auto&forecast_days=16");
+            const data = await response.json();
+            
+            const weatherMap = {};
+            for(let i=0; i<data.daily.time.length; i++) {
+                const dateStr = data.daily.time[i]; 
+                const d = new Date(dateStr);
+                const day = d.getDate();
+                const month = d.getMonth() + 1;
+                
+                const maxT = Math.round(data.daily.temperature_2m_max[i]);
+                const minT = Math.round(data.daily.temperature_2m_min[i]);
+                const rainProb = data.daily.precipitation_probability_max[i];
+                const rainSum = data.daily.precipitation_sum[i];
+                const wind = data.daily.wind_speed_10m_max[i];
+                const code = data.daily.weather_code[i];
+                
+                // Smart Summary
+                let summary = "שמשי ויבש, תנאים נוחים";
+                if(code >= 1 && code <= 3) summary = "עננות חלקית, שילוב של שמש ועננים";
+                if(code >= 45 && code <= 48) summary = "ערפילי (בעיקר בבוקר)";
+                if(code >= 51 && code <= 67) summary = "מעונן עם גשם קל עד בינוני בחלק משעות היום";
+                if(code >= 80 && code <= 82) summary = "גשם שוטף / ממטרים חזקים";
+                if(code >= 95) summary = "סופות רעמים וגשם";
+                
+                // Smart Focus (Recommendations exactly like Gemini)
+                let focus = "תנאים מצוינים ויבשים להליכה. מזג אוויר אידיאלי למסלול."; 
+                if (rainProb >= 50 || rainSum > 3) {
+                    focus = "יום גשום! חובה להצטייד במעיל גשם, כיסוי לתרמיל והליכה זהירה במדרונות חלקים. מומלץ לשקול שעת יציאה בבוקר בהתאם למכ\\"ם פתוח.";
+                } else if (rainProb >= 20) {
+                    focus = "ייתכן ממטר מקומי קל אחה\\"צ. מומלץ להחזיק ציוד גשם נגיש בתיק למקרה הצורך, אך רוב היום צפוי להיות נוח.";
+                } else if (wind > 35) {
+                    focus = "תנאים יבשים אך צפויות רוחות ערות ברכסים הגבוהים. מומלץ להצטייד במעיל רוח לחציית האוכף.";
+                } else if (maxT < 14) {
+                    focus = "תנאים קרים. מומלץ לבוש חם בשכבות (שיטת הבצל) ולצאת מוקדם כדי לנצל את שעות השמש.";
+                } else if (maxT >= 25) {
+                    focus = "יום חם מהרגיל. יש להקפיד על שתייה מרובה (לפחות 3 ליטר) וקרם הגנה. עדיף לצאת מוקדם.";
+                } else if (code <= 3 && rainProb < 10) {
+                    focus = "תנאים מצוינים ויבשים לחציית קניונים ועלייה לרכסים. מזג אוויר אידיאלי.";
+                }
+
+                weatherMap[`${day}.${month}`] = { maxT, minT, rainProb, summary, focus };
+            }
+
+            document.querySelectorAll('.weather-widget').forEach(el => {
+                const dateAttr = el.getAttribute('data-date');
+                if(weatherMap[dateAttr]) {
+                    const w = weatherMap[dateAttr];
+                    el.querySelector('.w-summary').innerHTML = `<strong>מזג אוויר:</strong> ${w.summary}`;
+                    el.querySelector('.w-temp').innerHTML = `<strong>טמפרטורות:</strong> ביום ${w.maxT}°C | בלילה ${w.minT}°C`;
+                    el.querySelector('.w-rain').innerHTML = `<strong>סיכוי למשקעים:</strong> ${w.rainProb}%`;
+                    
+                    const focusEl = el.querySelector('.weather-focus');
+                    focusEl.style.display = 'block';
+                    focusEl.innerHTML = `<strong>דגש יומי והמלצות:</strong> ${w.focus}`;
+                }
+            });
+
+            btn.innerHTML = '<i class="fa-solid fa-check"></i> התחזית החכמה עודכנה!';
+            setTimeout(() => {
+                btn.innerHTML = '<i class="fa-solid fa-cloud-sun"></i> עדכן תחזית חכמה עכשיו';
+                btn.disabled = false;
+            }, 4000);
+
+        } catch (e) {
+            console.error(e);
+            btn.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> שגיאת חיבור';
+            setTimeout(() => {
+                btn.innerHTML = '<i class="fa-solid fa-cloud-sun"></i> עדכן תחזית חכמה עכשיו';
+                btn.disabled = false;
+            }, 4000);
+        }
+    }
+    </script>
 </body>
 </html>
 """
