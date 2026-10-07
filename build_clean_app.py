@@ -4,23 +4,55 @@ import re
 from guide_text import GUIDE_TEXT
 
 MANUAL_WEATHER = {
-    13: "שמש ברובה, יבש. 19°C ביום | 9°C בלילה | 1% סיכוי למשקעים.",
-    14: "שמש ברובה, תנאים נוחים ויבשים. 19°C ביום | 9°C בלילה | 0% סיכוי למשקעים.",
-    15: "שמש ועננות, ייתכן ממטר קל אחה\"צ. 18°C ביום | 9°C בלילה | 49% סיכוי למשקעים.",
-    16: "מעונן עם גשם (זהירות מהחלקה). 18°C ביום | 8°C בלילה | 60% סיכוי למשקעים.",
-    17: "התבהרות מהירה, שמש ועננות חלקית. 17°C ביום | 8°C בלילה | 1% סיכוי למשקעים.",
-    18: "מעונן ברובו עם פרקי שמש, סיכוי לטפטוף. 18°C ביום | 9°C בלילה | 25% סיכוי למשקעים."
+    13: {
+        "summary": "שמש ברובה, יבש",
+        "temp": "ביום 19°C | בלילה 9°C",
+        "rain": "1% (יבש)",
+        "focus": ""
+    },
+    14: {
+        "summary": "שמש ברובה, תנאים נוחים ויבשים",
+        "temp": "ביום 19°C | בלילה 9°C",
+        "rain": "0% (יבש לחלוטין)",
+        "focus": "תנאים מצוינים ויבשים לחציית קניון לוסיוס (Lousios Gorge) והגעה למנזרים."
+    },
+    15: {
+        "summary": "שילוב של שמש ועננות, ייתכן ממטר מקומי קל אחה\"צ",
+        "temp": "בכפרים 18°C ביום, 9°C בלילה (ברכס הגבוה כ-13°C–14°C עם רוח ערה)",
+        "rain": "49%",
+        "focus": "מומלץ לצאת מוקדם כדי לעבור את הרכס הגבוה לפני שעות אחר הצהריים."
+    },
+    16: {
+        "summary": "מעונן עם גשם בחלק ניכר משעות היום",
+        "temp": "ביום 18°C | בלילה 8°C",
+        "rain": "60%",
+        "focus": "יום גשום המצריך מעיל גשם, כיסוי לתרמיל והליכה זהירה במדרונות חלקים."
+    },
+    17: {
+        "summary": "התבהרות מהירה, שמש ועננות חלקית, יציב",
+        "temp": "ביום 17°C | בלילה 8°C",
+        "rain": "1% (יבש לחלוטין)",
+        "focus": ""
+    },
+    18: {
+        "summary": "מעונן ברובו עם פרקי שמש, סיכוי נמוך לטפטוף",
+        "temp": "ביום 18°C | בלילה 9°C",
+        "rain": "25%",
+        "focus": ""
+    }
 }
 
-def get_pdf_text_for_day(day_num):
-    pattern = fr"יום {day_num} \|.*?(?=(יום \d+ \|)|$)"
-    match = re.search(pattern, GUIDE_TEXT, re.DOTALL | re.MULTILINE)
-    if match:
-        text = match.group(0).strip()
-        lines = text.split('\n')
+# Parse the guide text into a dictionary mapped by PDF day_num
+parts = re.split(r'\n(?=יום \d+ \|)', GUIDE_TEXT.strip())
+day_texts = {}
+for p in parts:
+    p = p.strip()
+    if p.startswith('יום '):
+        num = int(re.search(r'יום (\d+)', p).group(1))
+        lines = p.split('\n')
+        # Skip the first line (title)
         content = '<br>'.join(lines[1:]).strip()
-        return content
-    return ""
+        day_texts[num] = content
 
 with open(r'C:\Users\Eyal Pick\.gemini\antigravity\brain\4dd4cf76-c8a9-4f41-a9e9-14b74fb877a7\scratch\menalon.json', 'r', encoding='utf-8') as f:
     df = json.load(f)
@@ -193,15 +225,29 @@ for i, row in enumerate(df):
             </div>
     '''
     
-    # 1. WEATHER (Always First)
-    static_weather = MANUAL_WEATHER.get(date_int, "אין מידע זמין.")
-    
-    html += f'''
-            <div class="info-block weather-block weather-widget" data-date="{date_int}.10">
+    # 1. WEATHER (Always First) - Using EXACT user-provided rich text
+    w_data = MANUAL_WEATHER.get(date_int)
+    if w_data:
+        focus_html = f'<div style="margin-top:10px; padding:10px; background:rgba(168, 85, 247, 0.2); border-radius:6px;"><strong>דגש יומי:</strong> {w_data["focus"]}</div>' if w_data.get("focus") else ""
+        
+        html += f'''
+            <div class="info-block weather-block">
                 <h4><i class="fa-solid fa-cloud-sun"></i> תחזית מזג אוויר</h4>
-                <p class="weather-text">{static_weather}</p>
+                <div style="font-size:1.1rem;">
+                    <p><strong>מזג אוויר:</strong> {w_data["summary"]}</p>
+                    <p><strong>טמפרטורות:</strong> {w_data["temp"]}</p>
+                    <p><strong>סיכוי למשקעים:</strong> {w_data["rain"]}</p>
+                    {focus_html}
+                </div>
             </div>
-    '''
+        '''
+    else:
+        html += f'''
+            <div class="info-block weather-block">
+                <h4><i class="fa-solid fa-cloud-sun"></i> תחזית מזג אוויר</h4>
+                <p>אין מידע זמין כרגע.</p>
+            </div>
+        '''
 
     # 2. EATS (Morning provisions)
     if eats:
@@ -213,7 +259,7 @@ for i, row in enumerate(df):
         '''
 
     # 3. ROUTE DESC & PDF INFO
-    pdf_info = get_pdf_text_for_day(day_num - 1)
+    pdf_info = day_texts.get(day_num - 1, "")
     
     if desc or notes or pdf_info:
         desc_text = str(desc or '')
@@ -243,68 +289,9 @@ for i, row in enumerate(df):
 html += """
         </div>
     </div>
-    
-    <!-- Dynamic Weather Script -->
-    <script>
-    async function updateWeather() {
-        try {
-            // Fetch 16-day forecast for Dimitsana area
-            const response = await fetch("https://api.open-meteo.com/v1/forecast?latitude=37.595&longitude=22.04&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max&timezone=auto&forecast_days=16");
-            const data = await response.json();
-            
-            const weatherMap = {};
-            for(let i=0; i<data.daily.time.length; i++) {
-                const dateStr = data.daily.time[i]; 
-                const d = new Date(dateStr);
-                const day = d.getDate();
-                const month = d.getMonth() + 1;
-                
-                const maxT = Math.round(data.daily.temperature_2m_max[i]);
-                const minT = Math.round(data.daily.temperature_2m_min[i]);
-                const rainProb = data.daily.precipitation_probability_max[i];
-                const code = data.daily.weather_code[i];
-                
-                let icon = "fa-sun";
-                let text = "שמשי ויבש";
-                if(code >= 1 && code <= 3) { icon = "fa-cloud-sun"; text = "מעונן חלקית"; }
-                if(code >= 45 && code <= 48) { icon = "fa-smog"; text = "ערפילי"; }
-                if(code >= 51 && code <= 67) { icon = "fa-cloud-rain"; text = "גשם קל / בינוני"; }
-                if(code >= 80 && code <= 82) { icon = "fa-cloud-showers-heavy"; text = "גשם שוטף"; }
-                if(code >= 95) { icon = "fa-bolt"; text = "סופות רעמים"; }
-                
-                weatherMap[`${day}.${month}`] = { maxT, minT, rainProb, icon, text };
-            }
-
-            // Inject live data into DOM
-            document.querySelectorAll('.weather-widget').forEach(el => {
-                const dateAttr = el.getAttribute('data-date'); // e.g. "13.10"
-                if(weatherMap[dateAttr]) {
-                    const w = weatherMap[dateAttr];
-                    const p = el.querySelector('.weather-text');
-                    p.innerHTML = `
-                        <div style="display:flex; align-items:center; gap:15px; margin-top:5px; color: #fff;">
-                            <i class="fa-solid ${w.icon} fa-2x" style="color:#a855f7;"></i>
-                            <div>
-                                <div style="font-weight:bold; font-size:1.15rem; color:#a855f7;">עדכון חי: ${w.text}</div>
-                                <div style="font-size:1rem; color: var(--text-secondary);">
-                                    ${w.maxT}°C ביום | ${w.minT}°C בלילה | סיכוי למשקעים: ${w.rainProb}%
-                                </div>
-                            </div>
-                        </div>
-                    `;
-                }
-            });
-        } catch (e) {
-            console.error("Failed to fetch live weather", e);
-            // Fallback to static data is already in HTML, so do nothing.
-        }
-    }
-    // Run live update when page loads
-    updateWeather();
-    </script>
 </body>
 </html>
 """
 
-with codecs.open('index.html', 'w', 'utf-8') as f:
+with open('index.html', 'w', encoding='utf-8') as f:
     f.write(html)
