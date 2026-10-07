@@ -1,5 +1,19 @@
 import json
 import codecs
+import re
+from guide_text import GUIDE_TEXT
+
+# Parse the guide text into a dictionary mapped by PDF day_num
+parts = re.split(r'\n(?=יום \d+ \|)', GUIDE_TEXT.strip())
+day_texts = {}
+for p in parts:
+    p = p.strip()
+    if p.startswith('יום '):
+        num = int(re.search(r'יום (\d+)', p).group(1))
+        lines = p.split('\n')
+        # Skip the first line (title)
+        content = '<br>'.join(lines[1:]).strip()
+        day_texts[num] = content
 
 with open(r'C:\Users\Eyal Pick\.gemini\antigravity\brain\4dd4cf76-c8a9-4f41-a9e9-14b74fb877a7\scratch\menalon.json', 'r', encoding='utf-8') as f:
     df = json.load(f)
@@ -62,13 +76,13 @@ html = """<!DOCTYPE html>
         
         .info-block {
             background: rgba(0,0,0,0.2);
-            padding: 1rem;
+            padding: 1.5rem;
             border-radius: 8px;
             margin-bottom: 1rem;
             border-right: 3px solid var(--accent-blue);
         }
-        .info-block h4 { color: var(--accent-blue); margin-bottom: 0.5rem; font-size: 1.1rem; }
-        .info-block p { color: var(--text-secondary); font-size: 0.95rem; }
+        .info-block h4 { color: var(--accent-blue); margin-bottom: 0.75rem; font-size: 1.2rem; }
+        .info-block p { color: var(--text-secondary); font-size: 1rem; line-height: 1.8; }
         
         .eats-block { border-right-color: var(--accent-green); }
         .eats-block h4 { color: var(--accent-green); }
@@ -106,8 +120,6 @@ html = """<!DOCTYPE html>
                 <h2 style="color: var(--accent-blue);"><i class="fa-solid fa-folder-open"></i> מסמכים שימושיים</h2>
             </div>
             <ul class="docs-list">
-                <li><a href="Menalon trail.xlsx" target="_blank"><i class="fa-solid fa-file-excel" style="color:#10b981;"></i> טבלת המסלול (Excel)</a></li>
-                <li><a href="כרטיסי טיסה.pdf" target="_blank"><i class="fa-solid fa-plane" style="color:#ef4444;"></i> כרטיסי טיסה</a></li>
                 <li><a href="menalon_trail_guide_v2.pdf" target="_blank"><i class="fa-solid fa-book" style="color:#3b82f6;"></i> מדריך שביל מנלון</a></li>
                 <li><a href="Mainalon_In_Search_of_Arcadia_-_Matt_Stanley.pdf" target="_blank"><i class="fa-solid fa-book-open" style="color:#f97316;"></i> ספר Arcadia</a></li>
             </ul>
@@ -140,7 +152,9 @@ for i, row in enumerate(df):
     
     drive_time_html = " | ".join(stats) if stats else "יום התארגנות / נסיעות"
     
-    hotel = row.get('מלון', '') or row.get('מלון הזמנה', '')
+    hotel = row.get('מלון הזמנה', '')
+    if not hotel: hotel = row.get('מלון', '')
+        
     hotel_notes = row.get('הערות למלון', '')
     price_euro = row.get('מחיר אירו')
     if hotel_notes is None: hotel_notes = ''
@@ -158,8 +172,13 @@ for i, row in enumerate(df):
             </div>
     '''
     
-    if desc or notes:
-        desc_text = str(desc or '') + '<br><br>' + str(notes or '')
+    pdf_info = day_texts.get(day_num - 1, "")
+    
+    if desc or notes or pdf_info:
+        desc_text = str(desc or '')
+        if notes: desc_text += '<br><br><strong>הערות לטיול:</strong> ' + str(notes)
+        if pdf_info: desc_text += '<br><br><div style="background:rgba(59, 130, 246, 0.15); padding: 15px; border-radius: 8px; border-right: 3px solid #3b82f6; margin-top:10px;"><h4 style="color:#3b82f6; margin-bottom:10px;"><i class="fa-solid fa-book"></i> מדריך מנלון (פירוט מהמסמך):</h4>' + pdf_info + '</div>'
+        
         html += f'''
             <div class="info-block">
                 <h4><i class="fa-solid fa-map-location-dot"></i> פירוט המסלול והערות</h4>
