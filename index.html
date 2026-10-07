@@ -1,0 +1,1407 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>לוח בקרה - יוון 2026 - Menalon Trail</title>
+    <!-- FontAwesome for Premium Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap');
+
+        :root {
+            --bg-main: #0b0f19;
+            --bg-card: rgba(30, 41, 59, 0.45);
+            --border-card: rgba(255, 255, 255, 0.08);
+            --border-glow: rgba(249, 115, 22, 0.2);
+            
+            --text-primary: #f8fafc;
+            --text-secondary: #cbd5e1; /* Lighter for readability */
+            --text-muted: #94a3b8; /* Lighter for readability */
+            
+            --accent-orange: #f97316;
+            --accent-yellow: #f59e0b;
+            --accent-red: #ef4444;
+            --accent-green: #10b981;
+            --accent-blue: #3b82f6;
+            --accent-cyan: #06b6d4;
+            
+            --gradient-accent: linear-gradient(135deg, #f97316 0%, #d97706 50%, #b45309 100%);
+            --gradient-glass: linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.01) 100%);
+            --gradient-weather: linear-gradient(135deg, rgba(6, 182, 212, 0.15) 0%, rgba(59, 130, 246, 0.05) 100%);
+            
+            --shadow-soft: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+            --shadow-glow: 0 0 20px 2px rgba(249, 115, 22, 0.15);
+            
+            --radius-lg: 16px;
+            --radius-md: 12px;
+            --radius-sm: 8px;
+            
+            --font-heading: 'Outfit', 'Inter', sans-serif;
+            --font-body: 'Inter', sans-serif;
+            
+            --transition-fast: 0.2s ease;
+            --transition-normal: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-main);
+            color: var(--text-primary);
+            font-family: var(--font-body);
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+            line-height: 1.6;
+            padding-bottom: 3rem;
+            font-size: 16px; /* Base font increased for better readability */
+        }
+
+        /* Decorative Background Elements */
+        body::before {
+            content: '';
+            position: absolute;
+            top: -10%;
+            left: -10%;
+            width: 50%;
+            height: 50%;
+            background: radial-gradient(circle, rgba(249, 115, 22, 0.08) 0%, rgba(0,0,0,0) 70%);
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        body::after {
+            content: '';
+            position: absolute;
+            bottom: -10%;
+            right: -10%;
+            width: 60%;
+            height: 60%;
+            background: radial-gradient(circle, rgba(59, 130, 246, 0.06) 0%, rgba(0,0,0,0) 70%);
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        [dir="rtl"] { text-align: right; }
+
+        .dashboard-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem 1.5rem;
+            width: 100%;
+        }
+
+        .header-card {
+            background: var(--gradient-glass);
+            border: 1px solid var(--border-card);
+            backdrop-filter: blur(16px);
+            border-radius: var(--radius-lg);
+            padding: 2.5rem 2rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 1.5rem;
+            box-shadow: var(--shadow-soft);
+            position: relative;
+            overflow: hidden;
+            width: 100%;
+        }
+
+        .header-card::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            left: 0;
+            height: 4px;
+            background: var(--gradient-accent);
+        }
+
+        .header-info h1 {
+            font-family: var(--font-heading);
+            font-size: 2.5rem;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            background: linear-gradient(120deg, #ffffff 40%, #fdba74 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 0.5rem;
+        }
+
+        .header-info p {
+            color: var(--text-secondary);
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .countdown-container {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid var(--border-card);
+            padding: 1rem 1.5rem;
+            border-radius: var(--radius-md);
+            flex-wrap: wrap;
+        }
+
+        .countdown-label {
+            font-size: 0.95rem;
+            color: var(--text-muted);
+            font-weight: 600;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+        }
+
+        .countdown-digits {
+            display: flex;
+            gap: 0.5rem;
+            font-family: var(--font-heading);
+            font-weight: 700;
+        }
+
+        .digit-group {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-width: 55px;
+        }
+
+        .digit-val {
+            font-size: 1.8rem;
+            color: var(--accent-orange);
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: var(--radius-sm);
+            padding: 0.3rem 0.6rem;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .digit-lbl {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-top: 0.25rem;
+        }
+
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        @media (min-width: 1024px) {
+            .main-grid {
+                grid-template-columns: 380px 1fr;
+            }
+        }
+
+        .sidebar-col {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .glass-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-card);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-soft);
+            overflow: hidden;
+            backdrop-filter: blur(12px);
+            transition: var(--transition-normal);
+            width: 100%;
+        }
+
+        .glass-card:hover {
+            border-color: var(--border-glow);
+            box-shadow: var(--shadow-soft), var(--shadow-glow);
+        }
+
+        .card-header {
+            padding: 1.25rem 1.5rem;
+            border-bottom: 1px solid var(--border-card);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .card-title {
+            font-family: var(--font-heading);
+            font-size: 1.3rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            color: #ffffff;
+        }
+
+        .card-title i {
+            color: var(--accent-orange);
+            font-size: 1.4rem;
+        }
+
+        .card-body {
+            padding: 1.5rem;
+        }
+
+        .ticket-card {
+            display: flex;
+            flex-direction: column;
+            gap: 1.2rem;
+        }
+
+        .ticket {
+            background: linear-gradient(135deg, rgba(30, 41, 59, 0.8) 0%, rgba(15, 23, 42, 0.9) 100%);
+            border: 1px dashed var(--border-card);
+            border-radius: var(--radius-md);
+            padding: 1.25rem;
+            position: relative;
+        }
+
+        .ticket-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            padding-bottom: 0.75rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .carrier-logo {
+            font-family: var(--font-heading);
+            font-weight: 800;
+            font-size: 1.2rem;
+            color: #3b82f6;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .flight-no { font-size: 0.9rem; color: var(--text-muted); }
+
+        .flight-path {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 1.2rem 0;
+            width: 100%;
+        }
+
+        .airport { display: flex; flex-direction: column; }
+        .airport.dest { align-items: flex-end; }
+
+        .airport-code {
+            font-family: var(--font-heading);
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: #ffffff;
+            line-height: 1.1;
+        }
+
+        .airport-name {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-top: 0.2rem;
+        }
+
+        .flight-arrow {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: var(--accent-orange);
+            flex-grow: 1;
+            position: relative;
+        }
+
+        .flight-arrow::before {
+            content: '';
+            position: absolute;
+            width: 60%;
+            height: 1px;
+            background: dashed var(--text-muted);
+            top: 50%;
+            z-index: 0;
+        }
+
+        .flight-arrow i {
+            z-index: 1;
+            background: #1e293b;
+            padding: 0 0.5rem;
+            font-size: 1.2rem;
+        }
+
+        .ticket-details {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            font-size: 0.9rem;
+        }
+
+        .detail-item { display: flex; flex-direction: column; }
+        .detail-label { color: var(--text-muted); font-size: 0.85rem; margin-bottom: 0.2rem; }
+        .detail-value { color: var(--text-primary); font-weight: 500; font-size: 1rem; }
+
+        .rental-info { display: flex; flex-direction: column; gap: 1.2rem; }
+        .supplier-brand { font-size: 1.3rem; font-weight: 700; color: var(--accent-yellow); display: flex; align-items: center; gap: 0.6rem; }
+        
+        .rental-car-details {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: var(--radius-md);
+            padding: 1.2rem;
+        }
+        .car-model { font-family: var(--font-heading); font-size: 1.2rem; font-weight: 600; margin-bottom: 0.4rem; color: #ffffff; }
+        .car-meta { font-size: 0.95rem; color: var(--text-secondary); display: flex; gap: 1rem; }
+        
+        .rental-times {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            padding-top: 1rem;
+        }
+
+        .alert-box {
+            background: rgba(245, 158, 11, 0.08);
+            border-radius: var(--radius-sm);
+            padding: 1rem;
+            font-size: 0.95rem;
+            line-height: 1.5;
+            color: #ffedd5;
+            border-right: 4px solid var(--accent-yellow);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border-card);
+            color: #ffffff;
+            padding: 0.8rem 1.2rem;
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: var(--transition-fast);
+            width: 100%;
+            justify-content: center;
+        }
+
+        .btn-secondary:hover { background: rgba(255, 255, 255, 0.08); border-color: var(--text-secondary); }
+
+        .critical-booking-card {
+            background: rgba(239, 68, 68, 0.08);
+            border: 1px solid rgba(239, 68, 68, 0.2);
+            border-right: 4px solid var(--accent-red);
+            border-radius: var(--radius-md);
+            padding: 1.25rem;
+            margin-bottom: 2rem;
+            font-size: 1rem;
+            line-height: 1.6;
+            color: #fca5a5;
+        }
+
+        .critical-booking-card h3 {
+            font-family: var(--font-heading);
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #fecaca;
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+        }
+
+        .critical-booking-card ul { margin-right: 1.5rem; display: flex; flex-direction: column; gap: 0.6rem; }
+        .critical-booking-card a { color: #93c5fd; text-decoration: underline; font-weight: 600; }
+        .task-item { display: flex; align-items: flex-start; gap: 0.65rem; padding: 0.5rem 0; cursor: pointer; transition: opacity 0.3s ease; }
+        .task-item:hover { opacity: 0.85; }
+        .task-item.done { opacity: 0.5; }
+        .task-item.done .task-label { text-decoration: line-through; }
+        .task-checkbox { flex-shrink: 0; width: 20px; height: 20px; border: 2px solid rgba(239, 68, 68, 0.5); border-radius: 4px; display: flex; align-items: center; justify-content: center; margin-top: 2px; transition: all 0.2s ease; background: transparent; }
+        .task-item.done .task-checkbox { background: rgba(34, 197, 94, 0.25); border-color: rgba(34, 197, 94, 0.7); }
+        .task-checkbox i { font-size: 0.7rem; color: #22c55e; opacity: 0; transition: opacity 0.2s ease; }
+        .task-item.done .task-checkbox i { opacity: 1; }
+        .task-label { flex: 1; }
+
+        .maps-pin-note {
+            background: rgba(59, 130, 246, 0.1);
+            border-right: 4px solid var(--accent-blue);
+            border-radius: var(--radius-sm);
+            padding: 1.25rem;
+            font-size: 1rem;
+            line-height: 1.5;
+            color: #bfdbfe;
+            margin-bottom: 2rem;
+        }
+
+        .timeline { display: flex; flex-direction: column; gap: 1.25rem; }
+
+        .day-card {
+            border: 1px solid var(--border-card);
+            border-radius: var(--radius-md);
+            background: rgba(30, 41, 59, 0.25);
+            overflow: hidden;
+            transition: var(--transition-fast);
+            width: 100%;
+        }
+
+        .day-card.active {
+            border-color: rgba(249, 115, 22, 0.4);
+            background: rgba(30, 41, 59, 0.45);
+        }
+
+        .day-header {
+            padding: 1.25rem 1.5rem;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 0.75rem;
+            cursor: pointer;
+            user-select: none;
+            background: rgba(255, 255, 255, 0.01);
+            width: 100%;
+            transition: var(--transition-fast);
+        }
+
+        @media (min-width: 600px) {
+            .day-header { flex-direction: row; justify-content: space-between; align-items: center; }
+        }
+
+        .day-header:hover { background: rgba(255, 255, 255, 0.03); }
+
+        .day-title-group {
+            display: flex;
+            align-items: flex-start;
+            flex-direction: column;
+            gap: 0.75rem;
+            width: 100%;
+        }
+
+        @media (min-width: 480px) {
+            .day-title-group { flex-direction: row; align-items: center; }
+        }
+
+        .day-badge {
+            background: var(--gradient-accent);
+            color: #ffffff;
+            font-family: var(--font-heading);
+            font-size: 1rem;
+            font-weight: 700;
+            padding: 0.4rem 0.8rem;
+            border-radius: 20px;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(249, 115, 22, 0.3);
+            flex-shrink: 0;
+        }
+
+        .day-title {
+            font-family: var(--font-heading);
+            font-weight: 600;
+            font-size: 1.2rem;
+            color: #ffffff;
+            word-wrap: break-word;
+            width: 100%;
+        }
+
+        .day-title span.en-title {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            font-weight: 400;
+            margin-top: 0.25rem;
+            display: block;
+        }
+
+        .day-meta {
+            font-size: 0.95rem;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+        }
+
+        @media (min-width: 600px) {
+            .day-meta { width: auto; justify-content: flex-end; gap: 1rem; }
+        }
+
+        .day-meta i.expand-icon { font-size: 1.1rem; transition: var(--transition-fast); }
+        .day-card.active i.expand-icon { transform: rotate(180deg); }
+
+        .day-content {
+            display: none;
+            padding: 1.5rem;
+            border-top: 1px solid var(--border-card);
+            animation: slideDown var(--transition-normal);
+            width: 100%;
+        }
+
+        .day-card.active .day-content { display: block; }
+
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
+
+        .route-info {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            margin-bottom: 1.5rem;
+            font-size: 0.95rem;
+        }
+
+        .route-badge {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 0.5rem 1rem;
+            border-radius: 30px;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: var(--transition-fast);
+        }
+        
+        a.route-badge:hover { background: rgba(255, 255, 255, 0.08); color: #ffffff; border-color: var(--text-secondary); }
+        .route-badge i { color: var(--accent-orange); }
+
+        .route-badge.weather-badge {
+            background: var(--gradient-weather);
+            border-color: rgba(6, 182, 212, 0.2);
+            color: #a5f3fc;
+        }
+        .route-badge.weather-badge i { color: var(--accent-cyan); }
+
+        .activity-list { display: flex; flex-direction: column; gap: 1rem; margin-bottom: 1.5rem; }
+
+        .activity-item {
+            display: flex;
+            gap: 1rem;
+            background: rgba(255, 255, 255, 0.01);
+            border: 1px solid rgba(255, 255, 255, 0.03);
+            border-radius: var(--radius-sm);
+            padding: 1rem;
+            align-items: flex-start;
+            width: 100%;
+        }
+
+        .activity-num {
+            background: rgba(249, 115, 22, 0.15);
+            color: var(--accent-orange);
+            font-family: var(--font-heading);
+            font-size: 1rem;
+            font-weight: 700;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            margin-top: 0.2rem;
+        }
+
+        .activity-details {
+            flex-grow: 1;
+            font-size: 1rem;
+            word-wrap: break-word;
+        }
+
+        .activity-details strong {
+            color: #ffffff;
+            font-size: 1.15rem;
+            display: block;
+            margin-bottom: 0.35rem;
+        }
+
+        .activity-details span.en-desc {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            display: block;
+            font-style: italic;
+            margin-top: 0.2rem;
+        }
+
+        .activity-buttons {
+            display: flex;
+            gap: 0.75rem;
+            margin-top: 0.75rem;
+            flex-wrap: wrap;
+        }
+
+        .itinerary-subsection {
+            margin-top: 1rem;
+            padding: 1.25rem;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            border-radius: var(--radius-sm);
+            font-size: 1rem;
+            width: 100%;
+        }
+
+        .subsection-header {
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: var(--accent-orange);
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .subsection-header.lodging-hdr { color: var(--accent-blue); }
+        .subsection-header.parking-hdr { color: var(--accent-yellow); }
+
+        .info-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            color: #93c5fd;
+            font-weight: 600;
+            text-decoration: underline;
+            margin-top: 0.25rem;
+        }
+
+        .info-link:hover { color: #bfdbfe; }
+        .info-link.website-link { color: #a5f3fc; }
+        .info-link.website-link:hover { color: #cffafe; }
+
+        .day-notes-section {
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            padding-top: 1.25rem;
+            margin-top: 1.25rem;
+            width: 100%;
+        }
+
+        .notes-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.75rem;
+        }
+
+        .notes-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-edit-note {
+            background: transparent;
+            border: none;
+            color: var(--accent-blue);
+            cursor: pointer;
+            font-size: 0.95rem;
+            display: flex;
+            align-items: center;
+            gap: 0.35rem;
+            font-weight: 600;
+        }
+
+        .notes-display {
+            background: rgba(15, 23, 42, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.03);
+            border-radius: var(--radius-sm);
+            padding: 1rem;
+            font-size: 1rem;
+            color: var(--text-secondary);
+            min-height: 60px;
+            white-space: pre-wrap;
+            width: 100%;
+        }
+
+        .notes-display.empty { color: var(--text-muted); font-style: italic; }
+
+        .notes-editor {
+            display: none;
+            flex-direction: column;
+            gap: 0.75rem;
+            width: 100%;
+        }
+
+        .notes-textarea {
+            width: 100%;
+            min-height: 100px;
+            background: rgba(15, 23, 42, 0.8);
+            border: 1px solid var(--border-card);
+            border-radius: var(--radius-sm);
+            color: var(--text-primary);
+            padding: 0.75rem;
+            font-family: var(--font-body);
+            font-size: 1rem;
+            resize: vertical;
+        }
+
+        .notes-textarea:focus { outline: none; border-color: var(--accent-orange); }
+
+        .editor-actions { display: flex; justify-content: flex-end; gap: 0.75rem; }
+
+        .btn-save-note, .btn-cancel-note {
+            padding: 0.5rem 1rem;
+            border-radius: var(--radius-sm);
+            font-size: 0.95rem;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .btn-save-note { background: var(--accent-orange); color: #ffffff; border: none; }
+        .btn-cancel-note { background: transparent; color: var(--text-muted); border: 1px solid var(--border-card); }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(11, 15, 25, 0.85);
+            backdrop-filter: blur(8px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            padding: 1.5rem;
+        }
+        .modal-overlay.active { display: flex; }
+        .modal-content {
+            background: #1e293b;
+            border: 1px solid var(--border-card);
+            border-radius: var(--radius-lg);
+            max-width: 600px; width: 100%;
+            box-shadow: var(--shadow-soft);
+        }
+        .modal-header { padding: 1.5rem; border-bottom: 1px solid rgba(255, 255, 255, 0.05); display: flex; justify-content: space-between; align-items: center; }
+        .modal-title { font-family: var(--font-heading); font-size: 1.4rem; font-weight: 700; color: #ffffff; }
+        .btn-close-modal { background: transparent; border: none; color: var(--text-secondary); font-size: 1.4rem; cursor: pointer; }
+        .modal-body { padding: 1.5rem; max-height: 70vh; overflow-y: auto; font-size: 1rem; line-height: 1.6;}
+        .modal-body p { margin-bottom: 1rem; color: var(--text-secondary); }
+        .modal-body ol { margin: 1rem 0 1rem 1.5rem; display: flex; flex-direction: column; gap: 0.75rem; }
+        [dir="rtl"] .modal-body ol { margin-left: 0; margin-right: 1.5rem; }
+
+        /* Sliding Drawer Styles */
+        .drawer-backdrop {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(4px);
+            z-index: 9998;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .drawer-backdrop.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .sliding-drawer {
+            position: fixed;
+            top: 0;
+            right: -100%; /* Off-canvas to the right */
+            width: 100%;
+            max-width: 600px;
+            height: 100vh;
+            background: var(--bg-main);
+            z-index: 9999;
+            box-shadow: -10px 0 30px rgba(0,0,0,0.8);
+            transition: right 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            border-left: 1px solid var(--border-card);
+        }
+
+        [dir="ltr"] .sliding-drawer {
+            right: auto;
+            left: -100%;
+            border-left: none;
+            border-right: 1px solid var(--border-card);
+            transition: left 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .sliding-drawer.open {
+            right: 0;
+        }
+
+        [dir="ltr"] .sliding-drawer.open {
+            left: 0;
+        }
+
+        .drawer-header {
+            padding: 1.5rem;
+            background: var(--gradient-glass);
+            border-bottom: 1px solid var(--border-card);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .drawer-title {
+            font-family: var(--font-heading);
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .drawer-close {
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            color: var(--text-primary);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            transition: var(--transition-fast);
+        }
+
+        .drawer-close:hover {
+            background: var(--accent-red);
+            color: white;
+            transform: rotate(90deg);
+        }
+
+        .drawer-content {
+            padding: 2rem 1.5rem;
+            overflow-y: auto;
+            flex: 1;
+            font-size: 1.1rem;
+            line-height: 1.8;
+            color: var(--text-secondary);
+        }
+
+        .drawer-content h3 {
+            color: var(--text-primary);
+            margin-top: 1.5rem;
+            margin-bottom: 0.5rem;
+            font-family: var(--font-heading);
+        }
+        
+        .drawer-content p {
+            margin-bottom: 1rem;
+        }
+
+        .drawer-content ul {
+            margin-right: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .drawer-content li {
+            margin-bottom: 0.5rem;
+        }
+
+        .btn-expand {
+            background: rgba(249, 115, 22, 0.15);
+            color: var(--accent-orange);
+            border: 1px solid rgba(249, 115, 22, 0.3);
+            padding: 0.4rem 0.8rem;
+            border-radius: var(--radius-sm);
+            font-family: var(--font-body);
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition-fast);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+
+        .btn-expand:hover {
+            background: var(--accent-orange);
+            color: white;
+        }
+
+        @media (max-width: 768px) {
+            body { font-size: 15px; }
+            .dashboard-container { padding: 1rem 0.5rem; }
+            .header-info h1 { font-size: 2rem; }
+            .countdown-container { justify-content: center; }
+            .airport-code { font-size: 1.5rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="dashboard-container">
+        
+        <header class="header-card">
+            <div class="header-info">
+                <h1>יוון 2026 - Menalon Trail</h1>
+                <p><i class="fa-regular fa-calendar-days"></i> 29 ביוני – 10 ביולי | אייל & מירי</p>
+            </div>
+            
+            <div class="countdown-container">
+                <div class="countdown-label">זמן להמראה:</div>
+                <div class="countdown-digits" id="countdown">
+                    <div class="digit-group">
+                        <div class="digit-val" id="cd-days">00</div>
+                        <div class="digit-lbl">ימים</div>
+                    </div>
+                    <div class="digit-group">
+                        <div class="digit-val" id="cd-hours">00</div>
+                        <div class="digit-lbl">שעות</div>
+                    </div>
+                    <div class="digit-group">
+                        <div class="digit-val" id="cd-mins">00</div>
+                        <div class="digit-lbl">דקות</div>
+                    </div>
+                    <div class="digit-group">
+                        <div class="digit-val" id="cd-secs">00</div>
+                        <div class="digit-lbl">שניות</div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <div class="main-grid">
+            
+            <!-- Sidebar Area -->
+            <aside class="sidebar-col">
+                
+                <section class="glass-card">
+                    <div class="card-header">
+                        <h2 class="card-title"><i class="fa-solid fa-plane"></i> פרטי טיסות</h2>
+                    </div>
+                    <div class="card-body ticket-card">
+                        
+                        <div class="ticket">
+                            <div class="ticket-header">
+                                <span class="carrier-logo elal"><i class="fa-solid fa-plane-departure"></i> אל על</span>
+                                <span class="flight-no">LY395</span>
+                            </div>
+                            <div class="flight-path">
+                                <div class="airport">
+                                    <span class="airport-code">TLV</span>
+                                    <span class="airport-name">נתב"ג, טרמינל 3</span>
+                                </div>
+                                <div class="flight-arrow"><i class="fa-solid fa-plane"></i></div>
+                                <div class="airport dest">
+                                    <span class="airport-code">MAD</span>
+                                    <span class="airport-name">מדריד, טרמינל 4S</span>
+                                </div>
+                            </div>
+                            <div class="ticket-details">
+                                <div class="detail-item">
+                                    <span class="detail-label">המראה</span>
+                                    <span class="detail-value">29.06.26 | 05:00</span>
+                                </div>
+                                <div class="detail-item">
+                                    <span class="detail-label">נחיתה</span>
+                                    <span class="detail-value">29.06.26 | 09:20</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="ticket">
+                            <div class="ticket-header">
+                                <span class="carrier-logo elal"><i class="fa-solid fa-plane-arrival"></i> אל על</span>
+                                <span class="flight-no">LY396</span>
+                            </div>
+                            <div class="flight-path">
+                                <div class="airport">
+                                    <span class="airport-code">MAD</span>
+                                    <span class="airport-name">מדריד, טרמינל 4S</span>
+                                </div>
+                                <div class="flight-arrow"><i class="fa-solid fa-plane" style="transform: scaleX(-1);"></i></div>
+                                <div class="airport dest">
+                                    <span class="airport-code">TLV</span>
+                                    <span class="airport-name">נתב"ג, טרמינל 3</span>
+                                </div>
+                            </div>
+                            <div class="ticket-details">
+                                <div class="detail-item">
+                                    <span class="detail-label">המראה</span>
+                                    <span class="detail-value">10.07.26 | 10:50</span>
+                                </div>
+                                <div class="detail-item">
+                                    <span class="detail-label">נחיתה</span>
+                                    <span class="detail-value">10.07.26 | 16:25</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="glass-card">
+                    <div class="card-header">
+                        <h2 class="card-title"><i class="fa-solid fa-car"></i> השכרת רכב</h2>
+                    </div>
+                    <div class="card-body rental-info">
+                        <div class="supplier-brand"><i class="fa-solid fa-car-side"></i> דולר ספרד (Dollar Spain)</div>
+                        <div class="rental-car-details">
+                            <div class="car-model">פורד פוקוס סטיישן (Ford Focus Stw)</div>
+                            <div class="car-meta">
+                                <span><i class="fa-solid fa-gears"></i> אוטומט</span>
+                                <span><i class="fa-solid fa-snowflake"></i> מיזוג אוויר</span>
+                            </div>
+                        </div>
+                        <div class="rental-times">
+                            <div class="detail-item">
+                                <span class="detail-label">איסוף (מדריד)</span>
+                                <span class="detail-value">29.06.26 | 10:30</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">החזרה (מדריד)</span>
+                                <span class="detail-value">10.07.26 | 08:00</span>
+                            </div>
+                        </div>
+                        <div class="alert-box">
+                            <i class="fa-solid fa-circle-info"></i> מאושר מעבר לפורטוגל. ביטוח מחוץ למדינה בעלות 16 יורו. נדרש רישיון נהיגה בינלאומי וכרטיס אשראי פיזי.
+                        </div>
+                        <button class="btn-secondary" id="btn-toll-modal">
+                            <i class="fa-solid fa-road"></i> מדריך כבישי אגרה בפורטוגל
+                        </button>
+                    </div>
+                </section>
+
+            </aside>
+            
+            <!-- Main Content Area -->
+            <main style="display: flex; flex-direction: column; gap: 2rem;">
+                
+                <section class="glass-card">
+                    <div class="card-header">
+                        <h2 class="card-title"><i class="fa-solid fa-route"></i> המסלול המלא – עדכון פורטוגל</h2>
+                    </div>
+                    <div class="card-body">
+                        <div class="critical-booking-card" id="pretrip-tasks">
+                            <h3><i class="fa-solid fa-triangle-exclamation"></i> משימות לפני הנסיעה — סמנו כשבוצע!</h3>
+                            <p>חובה להזמין מראש כדי להבטיח מקום ולהימנע מתורים ארוכים:</p>
+                            <div id="task-list" style="margin-top:0.8rem; display:flex; flex-direction:column; gap:0.2rem;"></div>
+                        </div>
+                        
+                        <div class="maps-pin-note">
+                            <i class="fa-solid fa-location-dot"></i> <strong>ניווט קליל:</strong> בכל יום תמצאו כפתורי "ניווט במפות". לחיצה עליהם תפתח מיד את ה-Google Maps בנייד שלכם בדיוק ביעד, בחניון או במסעדה! אין צורך להקליד שום דבר.
+                        </div>
+
+                        <div class="timeline" id="itinerary-timeline">
+                            <!-- Populated by JS -->
+                        </div>
+                    </div>
+                </section>
+
+            </main>
+
+        </div>
+    </div>
+
+    <!-- Toll Road Guide Modal -->
+    <div class="modal-overlay" id="toll-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">כבישי אגרה בפורטוגל</h3>
+                <button class="btn-close-modal" id="btn-close-toll"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="modal-body">
+                <p>בפורטוגל ישנם כבישי אגרה אלקטרוניים מלאים ללא קופות תשלום. כדי להימנע מקנסות עם רכב שמושכר בספרד, יש להפעיל מערכת שנקראת <strong>EasyToll</strong>:</p>
+                <ol>
+                    <li>ביום השני לטיול, כשתצאו מסלמנקה לכיוון פורטוגל, סעו לכיוון מעבר הגבול <em>Vilar Formoso</em>.</li>
+                    <li>ממש אחרי מעבר הגבול, חפשו שלטים המפנים לרכבים זרים: <strong>"Foreign Vehicles / EasyToll"</strong>.</li>
+                    <li>היכנסו למסלול זה, ועצרו ליד המכונה האוטומטית (לא יוצאים מהרכב).</li>
+                    <li>הכניסו כרטיס אשראי פיזי (לא באפליקציה). המערכת מצלמת את לוחית הרישוי וקושרת אותה לכרטיס האשראי.</li>
+                    <li>קחו את הקבלה המודפסת ושמרו עליה כהוכחת רישום.</li>
+                    <li>מעכשיו, בכל פעם שתעברו מתחת לשערי המצלמות בכביש מהיר בפורטוגל, כרטיס האשראי יחויב אוטומטית.</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sliding Drawer Elements -->
+    <div class="drawer-backdrop" id="drawer-backdrop" onclick="closeDrawer()"></div>
+    <div class="sliding-drawer" id="details-drawer">
+        <div class="drawer-header">
+            <h2 class="drawer-title" id="drawer-title">כותרת הפעילות</h2>
+            <button class="drawer-close" onclick="closeDrawer()"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <div class="drawer-content" id="drawer-body">
+            <!-- Dynamic content will be injected here -->
+        </div>
+    </div>
+
+    <script src="itineraryData.js"></script>
+    <script src="itineraryData.js"></script>
+<script src="injectData.js"></script>
+<script>
+        const countdownDays = document.getElementById("cd-days");
+        const countdownHours = document.getElementById("cd-hours");
+        const countdownMins = document.getElementById("cd-mins");
+        const countdownSecs = document.getElementById("cd-secs");
+        const itineraryTimeline = document.getElementById("itinerary-timeline");
+        const tollModal = document.getElementById("toll-modal");
+        const btnTollModal = document.getElementById("btn-toll-modal");
+        const btnCloseToll = document.getElementById("btn-close-toll");
+
+        let userNotes = JSON.parse(localStorage.getItem("spain_portugal_notes")) || {};
+        let activeDay = localStorage.getItem("spain_portugal_active_day") || "1";
+
+        const departureDate = new Date("2026-06-29T05:00:00").getTime();
+
+        function updateCountdown() {
+            const now = new Date().getTime();
+            const distance = departureDate - now;
+
+            if (distance < 0) {
+                countdownDays.innerText = "00"; countdownHours.innerText = "00";
+                countdownMins.innerText = "00"; countdownSecs.innerText = "00";
+                return;
+            }
+
+            countdownDays.innerText = String(Math.floor(distance / (1000 * 60 * 60 * 24))).padStart(2, "0");
+            countdownHours.innerText = String(Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))).padStart(2, "0");
+            countdownMins.innerText = String(Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60))).padStart(2, "0");
+            countdownSecs.innerText = String(Math.floor((distance % (1000 * 60)) / 1000)).padStart(2, "0");
+        }
+        setInterval(updateCountdown, 1000);
+        updateCountdown();
+
+        function renderItinerary() {
+            itineraryTimeline.innerHTML = "";
+            
+            itineraryData.forEach(day => {
+                const dayCard = document.createElement("div");
+                dayCard.className = `day-card ${activeDay == day.dayNum ? "active" : ""}`;
+                dayCard.id = `day-${day.dayNum}`;
+                
+                let activitiesHTML = "";
+                day.activities.forEach((act, idx) => {
+                    const mapsLink = act.mapsQuery.startsWith('http') ? act.mapsQuery : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(act.mapsQuery || act.title)}`;
+                    
+                    activitiesHTML += `
+                        <div class="activity-item">
+                            <div class="activity-num">${idx + 1}</div>
+                            <div class="activity-details">
+                                <strong>${act.title}</strong>
+                                <span>${act.desc}</span>
+                                ${act.enDesc ? `<span class="en-desc">${act.enDesc}</span>` : ''}
+                                <div class="activity-buttons">
+                                    <a href="${mapsLink}" target="_blank" class="route-badge" style="font-size:0.85rem; padding: 0.3rem 0.75rem;"><i class="fa-solid fa-map-location-dot"></i> ניווט מפות</a>
+                                    ${act.websiteUrl ? `<a href="${act.websiteUrl}" target="_blank" class="route-badge" style="font-size:0.85rem; padding: 0.3rem 0.75rem; color:#a5f3fc; border-color:rgba(6,182,212,0.3); background:rgba(6,182,212,0.1)"><i class="fa-solid fa-globe"></i> אתר רשמי</a>` : ''}
+                                    ${act.ticketUrl ? `<a href="${act.ticketUrl}" target="_blank" class="route-badge" style="font-size:0.85rem; padding: 0.3rem 0.75rem; color:#10b981; border-color:rgba(16,185,129,0.3); background:rgba(16,185,129,0.1)"><i class="fa-solid fa-ticket"></i> הצג כרטיס</a>` : ''}
+                                    ${act.detailsHtml ? `<button onclick="openDrawer(${day.dayNum - 1}, ${idx})" class="btn-expand"><i class="fa-solid fa-book-open"></i> קרא בהרחבה</button>` : ''}
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                const noteContent = userNotes[day.dayNum] || "";
+                const noteDisplayClass = noteContent ? "" : "empty";
+                const noteDisplayText = noteContent || "לחצו על 'עריכה' כדי לשמור כאן נקודות אישיות, כתובות או רעיונות ליום זה...";
+
+                dayCard.innerHTML = `
+                    <div class="day-header" onclick="toggleDay(${day.dayNum})">
+                        <div class="day-title-group">
+                            <div class="day-badge">יום ${day.dayNum}</div>
+                            <div class="day-title">
+                                ${day.titleHe}
+                                <span class="en-title">(${day.titleEn})</span>
+                            </div>
+                        </div>
+                        <div class="day-meta">
+                            <span>${day.dateText}</span>
+                            <i class="fa-solid fa-chevron-down expand-icon"></i>
+                        </div>
+                    </div>
+                    
+                    <div class="day-content">
+                        <div class="route-info">
+                            <div class="route-badge"><i class="fa-solid fa-car"></i> ${day.driveTime}</div>
+                            ${day.weatherText ? `<div class="route-badge weather-badge"><i class="fa-solid fa-cloud-sun"></i> ${day.weatherText}</div>` : ''}
+                        </div>
+                        
+                        <div class="activity-list">
+                            ${activitiesHTML}
+                        </div>
+
+                        <div class="itinerary-subsection">
+                            <div class="subsection-header lodging-hdr">
+                                <i class="fa-solid fa-hotel"></i> לינה (מלון / דירה):
+                            </div>
+                            <p style="margin-bottom:0.4rem; font-size:1.05rem;">
+                                <strong>${day.lodging.nameHe}</strong> <span style="color:var(--text-muted)">(${day.lodging.nameEn})</span>
+                            </p>
+                            <p style="color: var(--text-secondary); margin-bottom: 0.6rem;">${day.lodging.desc}</p>
+                            
+                            <div style="display:flex; gap:0.75rem; flex-wrap:wrap; margin-top:0.4rem;">
+                                ${day.lodging.mapsUrl ? `<a href="${day.lodging.mapsUrl}" target="_blank" class="info-link"><i class="fa-solid fa-map-pin"></i> מיקום במפה</a>` : ''}
+                                ${day.lodging.bookingUrl ? `<a href="${day.lodging.bookingUrl}" target="_blank" class="info-link website-link"><i class="fa-solid fa-bed"></i> עמוד המלון</a>` : ''}
+                            </div>
+                        </div>
+
+                        ${day.eatsHe ? `
+                        <div class="itinerary-subsection">
+                            <div class="subsection-header">
+                                <i class="fa-solid fa-utensils"></i> מסעדה / טברנה מומלצת:
+                            </div>
+                            <p style="color: #ffffff; font-weight:600; font-size:1.05rem; margin-bottom: 0.25rem;">
+                                ${day.eatsHe}
+                            </p>
+                            <p style="color: var(--text-secondary); margin-bottom: 0.6rem;">${day.eatsDesc}</p>
+                            
+                            <div style="display:flex; gap:1rem; flex-wrap:wrap; margin-top:0.4rem;">
+                                <a href="${day.eatsMapUrl}" target="_blank" class="info-link" style="color:var(--accent-orange)"><i class="fa-solid fa-map-location-dot"></i> מסעדה במפה</a>
+                                ${day.eatsWebUrl ? `<a href="${day.eatsWebUrl}" target="_blank" class="info-link website-link"><i class="fa-solid fa-link"></i> אתר/ביקורות</a>` : ''}
+                            </div>
+                        </div>
+                        ` : ''}
+
+                        <div class="itinerary-subsection">
+                            <div class="subsection-header parking-hdr">
+                                <i class="fa-solid fa-square-parking"></i> חניה מומלצת והתניידות:
+                            </div>
+                            <p style="color: var(--text-secondary); margin-bottom: 0.6rem;">${day.parkingTip}</p>
+                            ${day.parkingMapUrl ? `<a href="${day.parkingMapUrl}" target="_blank" class="info-link" style="color:var(--accent-yellow)"><i class="fa-solid fa-location-arrow"></i> חניון במפה</a>` : ''}
+                        </div>
+                        
+                        <div class="day-notes-section">
+                            <div class="notes-header">
+                                <span class="notes-title"><i class="fa-regular fa-pen-to-square"></i> ההערות והתכנון שלי:</span>
+                                <button class="btn-edit-note" onclick="editNote(event, ${day.dayNum})">
+                                    <i class="fa-solid fa-pencil"></i> עריכה
+                                </button>
+                            </div>
+                            <div class="notes-display ${noteDisplayClass}" id="note-display-${day.dayNum}">${noteDisplayText}</div>
+                            
+                            <div class="notes-editor" id="note-editor-${day.dayNum}">
+                                <textarea class="notes-textarea" id="note-input-${day.dayNum}" placeholder="רשמו כאן מידע שימושי, משימות או רשימת קניות ליום זה...">${noteContent}</textarea>
+                                <div class="editor-actions">
+                                    <button class="btn-cancel-note" onclick="cancelNote(event, ${day.dayNum})">ביטול</button>
+                                    <button class="btn-save-note" onclick="saveNote(event, ${day.dayNum})">שמירה</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                itineraryTimeline.appendChild(dayCard);
+            });
+        }
+
+        // --- Drawer Logic ---
+        function openDrawer(dayIdx, actIdx) {
+            const act = itineraryData[dayIdx].activities[actIdx];
+            document.getElementById('drawer-title').innerText = act.title;
+            document.getElementById('drawer-body').innerHTML = act.detailsHtml;
+            
+            document.getElementById('drawer-backdrop').classList.add('active');
+            document.getElementById('details-drawer').classList.add('open');
+            document.body.style.overflow = 'hidden'; // Prevent background scrolling
+        }
+
+        function closeDrawer() {
+            document.getElementById('drawer-backdrop').classList.remove('active');
+            document.getElementById('details-drawer').classList.remove('open');
+            document.body.style.overflow = '';
+        }
+
+        window.toggleDay = function(dayNum) {
+            const cards = document.querySelectorAll(".day-card");
+            cards.forEach(card => {
+                if (card.id === `day-${dayNum}`) {
+                    if (card.classList.contains("active")) {
+                        card.classList.remove("active");
+                        activeDay = null;
+                    } else {
+                        card.classList.add("active");
+                        activeDay = dayNum;
+                        setTimeout(() => {
+                            const headerOffset = 20;
+                            const elementPosition = card.getBoundingClientRect().top;
+                            const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+                            window.scrollTo({
+                                 top: offsetPosition,
+                                 behavior: "smooth"
+                            });
+                        }, 350);
+                    }
+                } else {
+                    card.classList.remove("active");
+                }
+            });
+            localStorage.setItem("spain_portugal_active_day", activeDay);
+        };
+
+        window.editNote = function(event, dayNum) {
+            event.stopPropagation();
+            document.getElementById(`note-display-${dayNum}`).style.display = "none";
+            document.getElementById(`note-editor-${dayNum}`).style.display = "flex";
+            document.getElementById(`note-input-${dayNum}`).focus();
+        };
+
+        window.cancelNote = function(event, dayNum) {
+            event.stopPropagation();
+            document.getElementById(`note-display-${dayNum}`).style.display = "block";
+            document.getElementById(`note-editor-${dayNum}`).style.display = "none";
+        };
+
+        window.saveNote = function(event, dayNum) {
+            event.stopPropagation();
+            const newNote = document.getElementById(`note-input-${dayNum}`).value.trim();
+            userNotes[dayNum] = newNote;
+            localStorage.setItem("spain_portugal_notes", JSON.stringify(userNotes));
+            renderItinerary();
+        };
+
+        btnTollModal.addEventListener("click", () => { tollModal.classList.add("active"); });
+        btnCloseToll.addEventListener("click", () => { tollModal.classList.remove("active"); });
+        tollModal.addEventListener("click", (e) => { if (e.target === tollModal) tollModal.classList.remove("active"); });
+
+        const pretripTasks = [
+            { id: "regaleira", text: '<strong>אחוזת רגאליירה (Sintra)</strong> – כרטיס מראש ליום 05/07 שעה 09:30. <a href="https://regaleira.byblueticket.pt/" target="_blank">להזמנה אונליין</a>' },
+            { id: "tomar", text: '<strong>מנזר הצלוב בטומאר (Tomar)</strong> – מומלץ להזמין כרטיס מראש ליום 04/07. <a href="https://www.conventodecristo.gov.pt/" target="_blank">אתר המנזר</a>' },
+            { id: "batalha", text: '<strong>מנזר בטאליה (Batalha)</strong> – מומלץ להזמין מראש ליום 04/07. <a href="https://www.mosteirobatalha.gov.pt/" target="_blank">אתר המנזר</a>' },
+            { id: "jeronimos", text: '<strong>מנזר ז\'רונימוש (Lisbon)</strong> – כרטיסים מראש. בלם עמוס מאוד בקיץ. <a href="https://www.patrimoniocultural.gov.pt/en/museus-e-monumentos/dgpc/m/mosteiro-dos-jeronimos/" target="_blank">להזמנה אונליין</a>' },
+            { id: "taylors", text: '<strong>מרתפי יין בוילה נובה דה גאיה (Porto)</strong> – מומלץ להזמין סיור וטעימה מראש בקיץ. <a href="https://www.taylors.pt/en/visit-us/" target="_blank">Taylor\'s</a> | <a href="https://www.grahams-port.com/en/visit" target="_blank">Graham\'s</a>' },
+            { id: "douro_winery", text: '<strong>סיור ביקב בדואורו</strong> – רוב היקבים דורשים הזמנה מראש בקיץ. Quinta do Bomfim / Quinta do Crasto.' },
+            { id: "evora_rest", text: '<strong>טברנה Quarta-Feira (Évora)</strong> – חובה להזמין מקום מראש — קטנה ומלאה. <a href="https://www.tripadvisor.pt/Restaurant_Review-g189143-d1226997-Reviews-Taberna_Tipica_Quarta_Feira-Evora_Evora_District_Alentejo.html" target="_blank">ביקורות בטריפ-אדוייזר</a>' },
+            { id: "cancel_lamego", text: '<strong>ביטול הזמנה: Casinha da Ti\'Augusta</strong> — (הייתה ב-30/06 בלמגו)' },
+            { id: "cancel_lisbon", text: '<strong>ביטול הזמנה: EXE Liberdade</strong> — (הזמנה כפולה בליסבון ב-05/07)' }
+        ];
+
+        let taskStates = JSON.parse(localStorage.getItem("spain_portugal_tasks")) || {};
+
+        function renderTasks() {
+            const container = document.getElementById("task-list");
+            if (!container) return;
+            container.innerHTML = "";
+            pretripTasks.forEach(task => {
+                const isDone = taskStates[task.id] === true;
+                const el = document.createElement("div");
+                el.className = "task-item " + (isDone ? "done" : "");
+                el.innerHTML = `
+                    <div class="task-checkbox"><i class="fa-solid fa-check"></i></div>
+                    <div class="task-label">` + task.text + `</div>
+                `;
+                el.addEventListener("click", (e) => {
+                    if (e.target.tagName === "A") return;
+                    taskStates[task.id] = !taskStates[task.id];
+                    localStorage.setItem("spain_portugal_tasks", JSON.stringify(taskStates));
+                    renderTasks();
+                });
+                container.appendChild(el);
+            });
+        }
+
+        renderTasks();
+        renderItinerary();
+
+    </script>
+</body>
+</html>
+
