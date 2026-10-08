@@ -35,11 +35,12 @@ async function fetchExchangeRate() {
 async function fetchExpenses() {
     document.getElementById('expenses-status').innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> טוען נתונים...';
     try {
-        const res = await fetch(WEB_APP_URL);
+        const res = await fetch(WEB_APP_URL + "?t=" + Date.now());
+        if (!res.ok) throw new Error("HTTP " + res.status);
         expenses = await res.json();
         renderExpenses();
     } catch (e) {
-        document.getElementById('expenses-status').innerHTML = '<i class="fa-solid fa-triangle-exclamation" style="color:var(--accent-red);"></i> שגיאה בטעינת נתונים';
+        document.getElementById('expenses-status').innerHTML = '<i class="fa-solid fa-triangle-exclamation" style="color:var(--accent-red);"></i> שגיאה: ' + e.message;
     }
 }
 
@@ -83,7 +84,7 @@ async function addExpense(e) {
     };
     
     try {
-        await fetch(WEB_APP_URL, {
+        await fetch(WEB_APP_URL + "?action=post", {
             method: 'POST',
             body: JSON.stringify(expenseData),
             mode: 'no-cors' // Prevent CORS blocked response issue on Google Apps Script redirect
