@@ -3,24 +3,25 @@ import codecs
 import re
 from guide_text import GUIDE_TEXT
 
+# Updated static weather based on Gemini's 08/10 forecast
 MANUAL_WEATHER = {
     13: {
-        "summary": "שמש ברובה, יבש",
+        "summary": "שמש ברובה, יבש ונוח",
         "temp": "ביום 19°C | בלילה 9°C",
         "rain": "1% (יבש)",
         "focus": ""
     },
     14: {
-        "summary": "שמש ברובה, תנאים נוחים ויבשים",
+        "summary": "שמש ברובה, תנאים נוחים ויציבים",
         "temp": "ביום 19°C | בלילה 9°C",
         "rain": "0% (יבש לחלוטין)",
-        "focus": "תנאים מצוינים ויבשים לחציית קניון לוסיוס (Lousios Gorge) והגעה למנזרים."
+        "focus": "תנאים אידיאליים לירידה לקניון לוסיוס (Lousios Gorge) ולמעבר בין המנזרים ללא חשש מסלעים רטובים."
     },
     15: {
         "summary": "שילוב של שמש ועננות, ייתכן ממטר מקומי קל אחה\"צ",
-        "temp": "בכפרים 18°C ביום, 9°C בלילה (ברכס הגבוה כ-13°C–14°C עם רוח ערה)",
+        "temp": "18°C ביום, 9°C בלילה (ברכס הגבוה כ-13°C–14°C עם רוח ערה)",
         "rain": "49%",
-        "focus": "מומלץ לצאת מוקדם כדי לעבור את הרכס הגבוה לפני שעות אחר הצהריים."
+        "focus": "מומלץ לצאת מוקדם כדי לעבור את מעבר ההרים (זיוגוביסטי) לפני שעות הצהריים."
     },
     16: {
         "summary": "מעונן עם גשם בחלק ניכר משעות היום",
@@ -29,7 +30,7 @@ MANUAL_WEATHER = {
         "focus": "יום גשום המצריך מעיל גשם, כיסוי לתרמיל והליכה זהירה במדרונות חלקים."
     },
     17: {
-        "summary": "התבהרות מהירה, שמש ועננות חלקית, יציב",
+        "summary": "התבהרות מהירה, שמש ועננות חלקית, יציב ויבש",
         "temp": "ביום 17°C | בלילה 8°C",
         "rain": "1% (יבש לחלוטין)",
         "focus": ""
@@ -144,10 +145,6 @@ html = """<!DOCTYPE html>
         }
         .docs-list li a:hover { background: rgba(255,255,255,0.1); border-color: var(--accent-blue); color: var(--accent-blue); }
         
-        .btn { display: inline-block; background: var(--accent-blue); color: #fff; padding: 0.75rem 1.25rem; border-radius: 6px; text-decoration: none; margin-top: 0.5rem; font-size: 1.05rem; cursor: pointer; border: none; font-family: 'Inter', sans-serif;}
-        .btn:hover { background: #2563eb; }
-        .btn:disabled { opacity: 0.6; cursor: not-allowed; }
-
         @media (max-width: 768px) {
             .dashboard-container { padding: 0.5rem 0.25rem; }
             .header-card { padding: 1.25rem 0.5rem; border-radius: 8px; margin-bottom: 1rem; }
@@ -165,10 +162,7 @@ html = """<!DOCTYPE html>
             <h1>יוון 2026 - Menalon Trail</h1>
             <p>13 באוקטובר - 22 באוקטובר 2026</p>
             <div style="margin-top:1.5rem;">
-                <button id="weather-update-btn" class="btn" style="background: #a855f7;" onclick="fetchSmartWeather()">
-                    <i class="fa-solid fa-cloud-sun"></i> עדכן תחזית חכמה עכשיו
-                </button>
-                <p style="font-size:0.9rem; color:var(--text-muted); margin-top:0.5rem;">מושך נתונים עדכניים ובונה המלצות יציאה חכמות (לא צורך חבילת גלישה)</p>
+                <p style="font-size:1.1rem; color:var(--text-muted);"><i class="fa-solid fa-cloud-sun" style="color:#a855f7;"></i> תחזית מזג אוויר מסונכרנת מול ספארק-ג'ימני (עודכן: 08/10)</p>
             </div>
         </header>
 
@@ -230,30 +224,19 @@ for i, row in enumerate(df):
             </div>
     '''
     
+    # Static weather block from Gemini
     w_data = MANUAL_WEATHER.get(date_int)
     if w_data:
-        focus_html = f'<div class="weather-focus" style="margin-top:10px; padding:10px; background:rgba(168, 85, 247, 0.2); border-radius:6px;"><strong>דגש יומי והמלצות:</strong> {w_data["focus"]}</div>' if w_data.get("focus") else '<div class="weather-focus" style="margin-top:10px; padding:10px; background:rgba(168, 85, 247, 0.2); border-radius:6px; display:none;"></div>'
+        focus_html = f'<div class="weather-focus" style="margin-top:10px; padding:10px; background:rgba(168, 85, 247, 0.2); border-radius:6px;"><strong>דגש יומי והמלצות:</strong> {w_data["focus"]}</div>' if w_data.get("focus") else ''
         
         html += f'''
-            <div class="info-block weather-block weather-widget" data-date="{date_int}.10" data-daynum="{day_num}">
+            <div class="info-block weather-block">
                 <h4><i class="fa-solid fa-cloud-sun"></i> תחזית מזג אוויר</h4>
                 <div style="font-size:1.1rem;">
                     <p class="w-summary"><strong>מזג אוויר:</strong> {w_data["summary"]}</p>
                     <p class="w-temp"><strong>טמפרטורות:</strong> {w_data["temp"]}</p>
                     <p class="w-rain"><strong>סיכוי למשקעים:</strong> {w_data["rain"]}</p>
                     {focus_html}
-                </div>
-            </div>
-        '''
-    else:
-        html += f'''
-            <div class="info-block weather-block weather-widget" data-date="{date_int}.10" data-daynum="{day_num}">
-                <h4><i class="fa-solid fa-cloud-sun"></i> תחזית מזג אוויר</h4>
-                <div style="font-size:1.1rem;">
-                    <p class="w-summary">אין מידע זמין כרגע.</p>
-                    <p class="w-temp"></p>
-                    <p class="w-rain"></p>
-                    <div class="weather-focus" style="margin-top:10px; padding:10px; background:rgba(168, 85, 247, 0.2); border-radius:6px; display:none;"></div>
                 </div>
             </div>
         '''
@@ -297,146 +280,12 @@ html += """
     </div>
     
     <script>
-    function getSmartFocus(dayNum, w) {
-        let focus = [];
-        
-        if (w.rainProb >= 50 || w.rainSum > 3) {
-            focus.push("יום גשום! חובה להצטייד במעיל גשם וכיסוי לתרמיל.");
-        } else if (w.rainProb >= 20) {
-            focus.push("ייתכן ממטר מקומי. כדאי להחזיק ציוד גשם נגיש.");
-        }
-        
-        if (w.rainProb >= 30 || w.rainSum > 1) {
-            focus.push("מומלץ ליציאה מוקדמת כדי להימנע מממטרי אחר הצהריים.");
-        }
-        
-        if (w.wind > 35) {
-            focus.push("רוחות חזקות צפויות ברכסים. מומלץ להצטייד במעיל רוח.");
-        }
-        if (w.maxT < 14) {
-            focus.push("תנאים קרים מהרגיל. מומלץ לבוש חם בשיטת הבצל.");
-        } else if (w.maxT >= 25) {
-            focus.push("יום חם. להקפיד על שתייה מרובה וקרם הגנה.");
-        }
-
-        // Trail specific rules based on day_num
-        // dayNum 2 = 14.10 (Stemnitsa -> Dimitsana)
-        if (dayNum === 2 && w.rainProb >= 20) {
-            focus.push("<br>⚠️ <strong>דגש בטיחות למקטע:</strong> סלעים ומדרגות חלקות בקניון לוסיוס (Lousios) בעת רטיבות! נדרשת הליכה זהירה מאוד.");
-        }
-        // dayNum 3 = 15.10 (Dimitsana/Zygovisti -> Elati)
-        if (dayNum === 3 && (w.wind > 20 || w.maxT < 15)) {
-            focus.push("<br>⚠️ <strong>דגש בטיחות למקטע:</strong> צפוי קור ורוחות במעברי הרכס הגבוהים (זיוגוביסטי - 1,550 מ'). חובה להצטייד במגן רוח וחימום לפני החצייה.");
-        }
-
-        if (focus.length === 0) {
-            focus.push("תנאים מצוינים ויבשים להליכה. מזג אוויר אידיאלי למסלול.");
-        }
-        return focus.join(" ");
-    }
-
-    function renderWeather(weatherData, lastUpdated) {
-        document.querySelectorAll('.weather-widget').forEach(el => {
-            const dateAttr = el.getAttribute('data-date');
-            const dayNum = parseInt(el.getAttribute('data-daynum'));
-            
-            if(weatherData[dateAttr]) {
-                const w = weatherData[dateAttr];
-                const focusText = getSmartFocus(dayNum, w);
-                
-                el.querySelector('.w-summary').innerHTML = `<strong>מזג אוויר:</strong> ${w.summary}`;
-                el.querySelector('.w-temp').innerHTML = `<strong>טמפרטורות:</strong> ביום ${w.maxT}°C | בלילה ${w.minT}°C`;
-                el.querySelector('.w-rain').innerHTML = `<strong>סיכוי למשקעים:</strong> ${w.rainProb}%`;
-                
-                const focusEl = el.querySelector('.weather-focus');
-                focusEl.style.display = 'block';
-                focusEl.innerHTML = `<strong>דגש יומי והמלצות:</strong> ${focusText}`;
-                
-                // Add timestamp if available
-                if (lastUpdated) {
-                    let tsEl = el.querySelector('.w-timestamp');
-                    if (!tsEl) {
-                        tsEl = document.createElement('div');
-                        tsEl.className = 'w-timestamp';
-                        tsEl.style.fontSize = '0.85rem';
-                        tsEl.style.color = 'var(--text-muted)';
-                        tsEl.style.marginTop = '8px';
-                        el.appendChild(tsEl);
-                    }
-                    const d = new Date(lastUpdated);
-                    tsEl.innerHTML = `<i class="fa-solid fa-clock-rotate-left"></i> עודכן לאחרונה: ${d.toLocaleDateString('he-IL')} בשעה ${d.toLocaleTimeString('he-IL', {hour: '2-digit', minute:'2-digit'})}`;
-                }
-            }
+        // JS Weather engine disabled to prevent overriding accurate Gemini/AccuWeather forecasts.
+        // localStorage is cleared to reset state.
+        window.addEventListener('DOMContentLoaded', () => {
+            localStorage.removeItem('menalon_weather');
+            localStorage.removeItem('menalon_weather_time');
         });
-    }
-
-    async function fetchSmartWeather() {
-        const btn = document.getElementById('weather-update-btn');
-        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> סורק מקורות מטאורולוגיים...';
-        btn.disabled = true;
-
-        try {
-            // Using elevation=1000 for Arcadia mountains to get accurate cold/wind models
-            const response = await fetch("https://api.open-meteo.com/v1/forecast?latitude=37.595&longitude=22.04&elevation=1000&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max,precipitation_sum,wind_speed_10m_max&timezone=auto&forecast_days=16");
-            const data = await response.json();
-            
-            const weatherMap = {};
-            for(let i=0; i<data.daily.time.length; i++) {
-                const dateStr = data.daily.time[i]; 
-                const d = new Date(dateStr);
-                const day = d.getDate();
-                const month = d.getMonth() + 1;
-                
-                const maxT = Math.round(data.daily.temperature_2m_max[i]);
-                const minT = Math.round(data.daily.temperature_2m_min[i]);
-                const rainProb = data.daily.precipitation_probability_max[i];
-                const rainSum = data.daily.precipitation_sum[i];
-                const wind = data.daily.wind_speed_10m_max[i];
-                const code = data.daily.weather_code[i];
-                
-                let summary = "שמשי ויבש, תנאים נוחים";
-                if(code >= 1 && code <= 3) summary = "עננות חלקית, שילוב של שמש ועננים";
-                if(code >= 45 && code <= 48) summary = "ערפילי (בעיקר בבוקר)";
-                if(code >= 51 && code <= 67) summary = "מעונן עם גשם קל עד בינוני";
-                if(code >= 80 && code <= 82) summary = "גשם שוטף / ממטרים חזקים";
-                if(code >= 95) summary = "סופות רעמים וגשם";
-                
-                weatherMap[`${day}.${month}`] = { maxT, minT, rainProb, rainSum, wind, summary };
-            }
-
-            // Save to localStorage
-            const now = new Date().getTime();
-            localStorage.setItem('menalon_weather', JSON.stringify(weatherMap));
-            localStorage.setItem('menalon_weather_time', now);
-            
-            renderWeather(weatherMap, now);
-
-            btn.innerHTML = '<i class="fa-solid fa-check"></i> התחזית וההמלצות עודכנו בהצלחה!';
-            setTimeout(() => {
-                btn.innerHTML = '<i class="fa-solid fa-cloud-sun"></i> עדכן תחזית חכמה עכשיו';
-                btn.disabled = false;
-            }, 4000);
-
-        } catch (e) {
-            console.error(e);
-            btn.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> שגיאת חיבור';
-            setTimeout(() => {
-                btn.innerHTML = '<i class="fa-solid fa-cloud-sun"></i> עדכן תחזית חכמה עכשיו';
-                btn.disabled = false;
-            }, 4000);
-        }
-    }
-
-    // Load saved weather on startup
-    window.addEventListener('DOMContentLoaded', () => {
-        const savedWeather = localStorage.getItem('menalon_weather');
-        const savedTime = localStorage.getItem('menalon_weather_time');
-        if (savedWeather) {
-            try {
-                renderWeather(JSON.parse(savedWeather), parseInt(savedTime));
-            } catch(e) {}
-        }
-    });
     </script>
 </body>
 </html>
