@@ -108,14 +108,29 @@ async function addExpense(e) {
     btn.innerHTML = 'הוסף הוצאה';
 }
 
+window.toggleExpensesApp = function() {
+    const el = document.getElementById('expenses-main-content');
+    if (el.style.display === 'none') {
+        el.style.display = 'block';
+    } else {
+        el.style.display = 'none';
+    }
+};
+
 function renderAppShell() {
     const container = document.getElementById('expenses-app');
     if (!container) return;
     
     container.innerHTML = `
-        <div class="card" style="border-color: var(--accent-green); box-shadow: 0 0 15px rgba(16, 185, 129, 0.1);">
+        <div style="margin-bottom: 2rem;">
+            <button class="btn" style="width: 100%; background: var(--bg-card); border: 1px solid var(--accent-green); color: var(--text-primary); padding: 15px; font-size: 1.3rem; font-weight: bold; border-radius: 12px; box-shadow: 0 4px 15px rgba(16, 185, 129, 0.1);" onclick="toggleExpensesApp()">
+                <i class="fa-solid fa-wallet" style="color: var(--accent-green); margin-left: 8px;"></i> ניהול הוצאות
+            </button>
+        </div>
+
+        <div id="expenses-main-content" class="card" style="display: none; border-color: var(--accent-green); box-shadow: 0 0 15px rgba(16, 185, 129, 0.1); margin-bottom: 2rem;">
             <div class="card-header" style="display: flex; justify-content: space-between; align-items: center; border-bottom: none; margin-bottom: 0;">
-                <h2 style="color: var(--accent-green); margin-bottom: 0; font-size: 1.6rem;"><i class="fa-solid fa-wallet"></i> התחשבנות כספית</h2>
+                <h2 style="color: var(--accent-green); margin-bottom: 0; font-size: 1.6rem;">פירוט חשבונות</h2>
                 <div id="expenses-status" style="font-size: 0.9rem; color: var(--text-muted);">ממתין...</div>
             </div>
             
