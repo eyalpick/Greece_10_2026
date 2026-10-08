@@ -135,49 +135,87 @@ const itineraryData = [
     {
         "dayNum": 7,
         "dateText": "19 באוקטובר (יום ב)",
-        "titleHe": "יום התארגנות / נסיעות",
-        "titleEn": "יום התארגנות / נסיעות",
-        "driveTime": "",
+        "titleHe": "לגקאדיה ← נמאה ← לוטראקי",
+        "titleEn": "Lagkadia → Nemea → Loutraki",
+        "driveTime": "כ-2.5 שעות עד לוטראקי",
         "weatherText": "15°C / 8°C",
-        "lodging": null,
+        "lodging": {
+            "nameHe": "מלון בלוטראקי (לחפש)",
+            "nameEn": "Loutraki Hotel (TBD)",
+            "desc": "לינה באזור מפרץ קורינתוס/לוטראקי בתקציב כ-100 אירו",
+            "bookingUrl": "",
+            "mapsUrl": ""
+        },
         "eatsHe": "אוכל והצטיידות",
-        "eatsDesc": "",
-        "activities": []
+        "eatsDesc": "טברנות בטיילת של לוטראקי",
+        "activities": [
+            {
+                "title": "נמאה (יקב Semeli) והגעה לים",
+                "desc": "נסיעה מלגקאדיה מזרחה. עוצרים באזור נמאה לביקור ביקב Semeli (יש להזמין טעימות יין מראש). אחה\"צ: הגעה ללוטראקי ושוטטות נינוחה בטיילת."
+            }
+        ]
     },
     {
         "dayNum": 8,
         "dateText": "20 באוקטובר (יום ג)",
-        "titleHe": "יום התארגנות / נסיעות",
-        "titleEn": "יום התארגנות / נסיעות",
-        "driveTime": "",
+        "titleHe": "לוטראקי, אקרוקורינתוס וספא",
+        "titleEn": "Loutraki, Acrocorinth & Thermal Spa",
+        "driveTime": "נסיעות קצרות באזור",
         "weatherText": "15°C / 8°C",
-        "lodging": null,
+        "lodging": {
+            "nameHe": "מלון בלוטראקי (לחפש)",
+            "nameEn": "Loutraki Hotel (TBD)",
+            "desc": "לילה שני באותו המלון",
+            "bookingUrl": "",
+            "mapsUrl": ""
+        },
         "eatsHe": "אוכל והצטיידות",
-        "eatsDesc": "",
-        "activities": []
+        "eatsDesc": "מומלץ לשבת באחת הטברנות ליד אגם ווליאגמני או סביבת העיירה",
+        "activities": [
+            {
+                "title": "תצפיות, הלגונה ופינוק בספא",
+                "desc": "ביקור בתצפית המטורפת של אקרוקורינתוס, משם לאגם ווליאגמני (לגונה כחולה טבעית) ומקדש הרה (Heraion). אחה\"צ: רגיעה ב-Loutraki Thermal Spa (יש להזמין מקום מראש)."
+            }
+        ]
     },
     {
         "dayNum": 9,
         "dateText": "21 באוקטובר (יום ד)",
-        "titleHe": "יום התארגנות / נסיעות",
-        "titleEn": "יום התארגנות / נסיעות",
-        "driveTime": "",
+        "titleHe": "תעלת קורינתוס והתקדמות קלילה",
+        "titleEn": "Corinth Canal & Drive to Airport",
+        "driveTime": "כשעה וחצי משוער",
         "weatherText": "15°C / 8°C",
-        "lodging": null,
+        "lodging": {
+            "nameHe": "מלון ליד שדה התעופה (לחפש)",
+            "nameEn": "Airport Area Hotel (TBD)",
+            "desc": "מלון פונקציונלי לשינה (למשל Holiday Inn או דירה ב-Spata)",
+            "bookingUrl": "",
+            "mapsUrl": ""
+        },
         "eatsHe": "אוכל והצטיידות",
-        "eatsDesc": "",
-        "activities": []
+        "eatsDesc": "ארוחת צהריים על הדרך או באזור תעלת קורינתוס",
+        "activities": [
+            {
+                "title": "יום נטול סיכונים ורגוע",
+                "desc": "יוצאים מאוחר (09:30-10:00). עוצרים לתצפית מרשימה על תעלת קורינתוס (Corinth Canal), ממשיכים בנסיעה רגועה לכיוון שדה התעופה (ללא כניסה לאתונה), ומגיעים למלון בשעות אחר הצהריים למנוחה לקראת הטיסה מחר."
+            }
+        ]
     },
     {
         "dayNum": 10,
         "dateText": "22 באוקטובר (יום ה)",
         "titleHe": "11:10 טיסה חזור",
-        "titleEn": "11:10 טיסה חזור",
-        "driveTime": "",
+        "titleEn": "11:10 Flight back",
+        "driveTime": "כ-15 דקות לשדה",
         "weatherText": "15°C / 8°C",
         "lodging": null,
         "eatsHe": "אוכל והצטיידות",
-        "eatsDesc": "",
-        "activities": []
+        "eatsDesc": "ארוחת בוקר בשדה התעופה",
+        "activities": [
+            {
+                "title": "חוזרים הביתה",
+                "desc": "קימה בנחת, הגעה לשדה התעופה בסביבות 08:30 לקראת טיסת הבוקר לישראל. החזרת הרכב וטיסה נעימה!"
+            }
+        ]
     }
 ];

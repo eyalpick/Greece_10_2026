@@ -53,8 +53,10 @@ for p in parts:
         content = '<br>'.join(lines[1:]).strip()
         day_texts[num] = content
 
-with open(r'C:\Users\Eyal Pick\.gemini\antigravity\brain\4dd4cf76-c8a9-4f41-a9e9-14b74fb877a7\scratch\menalon.json', 'r', encoding='utf-8') as f:
-    df = json.load(f)
+with open('itineraryData.js', 'r', encoding='utf-8') as f:
+    js_content = f.read()
+json_str = js_content[js_content.find('['):js_content.rfind(']')+1]
+df = json.loads(json_str)
 
 html = """<!DOCTYPE html>
 <html lang="he" dir="rtl">
@@ -186,42 +188,27 @@ html = """<!DOCTYPE html>
         <div id="days-container">
 """
 
-month = "באוקטובר"
-
-for i, row in enumerate(df):
-    date_val = row.get("תאריך")
-    if date_val is None: continue
+for day in df:
+    day_num = day.get("dayNum")
+    date_text = day.get("dateText", "")
+    title_he = day.get("titleHe", "יום התארגנות")
     
-    day_num = i + 1
-    date_int = int(date_val)
-    date_text = f"{date_int} {month} (יום {row.get('יום בשבוע', '')})"
-    title_he = row.get("מסלול", "יום התארגנות")
-    if not title_he: title_he = "יום התארגנות"
+    # Extract date_int (e.g. 13 from "13 באוקטובר")
+    import re
+    date_int_match = re.search(r'\d+', date_text)
+    date_int = int(date_int_match.group()) if date_int_match else 0
     
-    km = row.get('ק"מ')
-    time_est = row.get('זמן משוער')
-    elev_up = row.get('עלייה מצטברת')
-    elev_down = row.get('ירידה מצטברת')
+    drive_time_html = day.get("driveTime") or "יום התארגנות / נסיעות"
     
-    stats = []
-    if km: stats.append(f'<i class="fa-solid fa-person-walking"></i> {km} ק"מ')
-    if time_est: stats.append(f'<i class="fa-solid fa-clock"></i> {time_est}')
-    if elev_up: stats.append(f'<i class="fa-solid fa-arrow-trend-up"></i> {elev_up}')
-    if elev_down: stats.append(f'<i class="fa-solid fa-arrow-trend-down"></i> {elev_down}')
+    hotel_info = day.get("lodging")
+    hotel = ""
+    hotel_notes = ""
+    if hotel_info:
+        hotel = hotel_info.get("nameHe", "")
+        hotel_notes = hotel_info.get("desc", "")
     
-    drive_time_html = " | ".join(stats) if stats else "יום התארגנות / נסיעות"
-    
-    hotel = row.get('מלון הזמנה', '')
-    if not hotel: hotel = row.get('מלון', '')
-        
-    hotel_notes = row.get('הערות למלון', '')
-    price_euro = row.get('מחיר אירו')
-    if hotel_notes is None: hotel_notes = ''
-    if price_euro: hotel_notes += f". מחיר: €{price_euro}"
-    
-    eats = row.get('אוכל במסלול')
-    desc = row.get('תיאור')
-    notes = row.get('הערות לטיול')
+    eats = day.get("eatsDesc", "")
+    activities = day.get("activities", [])
     
     html += f'''
         <div class="card">
@@ -267,13 +254,16 @@ for i, row in enumerate(df):
             </div>
         '''
 
+    # Handle multiple activities or legacy pdf_info
     pdf_info = day_texts.get(day_num - 1, "")
+    desc_text = ""
+    for act in activities:
+        desc_text += f"<strong>{act.get('title','')}</strong><br>{act.get('desc','')}<br><br>"
     
-    if desc or notes or pdf_info:
-        desc_text = str(desc or '')
-        if notes: desc_text += '<br><br><strong>הערות לטיול:</strong> ' + str(notes)
-        if pdf_info: desc_text += '<br><br><div style="background:rgba(59, 130, 246, 0.15); padding: 15px; border-radius: 8px; border-right: 3px solid #3b82f6; margin-top:10px;"><h4 style="color:#3b82f6; margin-bottom:10px; font-size: 1.15rem;"><i class="fa-solid fa-book"></i> מדריך מנלון (פירוט מהמסמך):</h4>' + pdf_info + '</div>'
+    if pdf_info:
+        desc_text += '<div style="background:rgba(59, 130, 246, 0.15); padding: 15px; border-radius: 8px; border-right: 3px solid #3b82f6; margin-top:10px;"><h4 style="color:#3b82f6; margin-bottom:10px; font-size: 1.15rem;"><i class="fa-solid fa-book"></i> מדריך מנלון (פירוט מהמסמך):</h4>' + pdf_info + '</div>'
         
+    if desc_text:
         html += f'''
             <div class="info-block">
                 <h4><i class="fa-solid fa-map-location-dot"></i> פירוט המסלול</h4>
