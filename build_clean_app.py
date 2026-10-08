@@ -337,7 +337,7 @@ html += """
                 
                 el.querySelector('.w-summary').innerHTML = `<strong>מזג אוויר:</strong> ${w.summary}`;
                 el.querySelector('.w-temp').innerHTML = `<strong>טמפרטורות:</strong> ביום ${w.maxT}°C | בלילה ${w.minT}°C`;
-                el.querySelector('.w-rain').innerHTML = `<strong>סיכוי למשקעים:</strong> ${w.rainProb}%`;
+                el.querySelector('.w-rain').innerHTML = `<strong>סיכוי למשקעים:</strong> ${w.rainProb}% <br><span style="font-size:0.9rem; color:var(--text-muted);">בוקר (06-12): ${w.morningProb}% (${w.morningSum} מ"מ) | צהריים (12-18): ${w.noonProb}% (${w.noonSum} מ"מ)</span>`;
                 
                 const focusEl = el.querySelector('.weather-focus');
                 focusEl.style.display = 'block';
@@ -367,7 +367,7 @@ html += """
 
         try {
             // Using elevation=1000 for Arcadia mountains to get accurate cold/wind models
-            const response = await fetch("https://api.open-meteo.com/v1/forecast?latitude=37.595&longitude=22.04&elevation=1000&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max,precipitation_sum,wind_speed_10m_max&timezone=auto&forecast_days=16");
+            const response = await fetch("https://api.open-meteo.com/v1/forecast?latitude=37.595&longitude=22.04&elevation=1000&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max,precipitation_sum,wind_speed_10m_max&hourly=precipitation_probability,precipitation&timezone=auto&forecast_days=16");
             const data = await response.json();
             
             const weatherMap = {};
@@ -384,6 +384,30 @@ html += """
                 const wind = data.daily.wind_speed_10m_max[i];
                 const code = data.daily.weather_code[i];
                 
+                let morningProb = 0; let morningSum = 0;
+                let noonProb = 0; let noonSum = 0;
+                
+                if (data.hourly) {
+                    for(let h=0; h<data.hourly.time.length; h++) {
+                        const hTime = data.hourly.time[h];
+                        if (hTime.startsWith(dateStr)) {
+                            const hour = parseInt(hTime.substring(11, 13));
+                            const hProb = data.hourly.precipitation_probability[h] || 0;
+                            const hSum = data.hourly.precipitation[h] || 0;
+                            
+                            if (hour >= 6 && hour <= 11) {
+                                morningProb = Math.max(morningProb, hProb);
+                                morningSum += hSum;
+                            } else if (hour >= 12 && hour <= 17) {
+                                noonProb = Math.max(noonProb, hProb);
+                                noonSum += hSum;
+                            }
+                        }
+                    }
+                    morningSum = Math.round(morningSum * 10) / 10;
+                    noonSum = Math.round(noonSum * 10) / 10;
+                }
+
                 let summary = "שמשי ויבש, תנאים נוחים";
                 if(code >= 1 && code <= 3) summary = "עננות חלקית, שילוב של שמש ועננים";
                 if(code >= 45 && code <= 48) summary = "ערפילי (בעיקר בבוקר)";
@@ -391,7 +415,13 @@ html += """
                 if(code >= 80 && code <= 82) summary = "גשם שוטף / ממטרים חזקים";
                 if(code >= 95) summary = "סופות רעמים וגשם";
                 
-                weatherMap[`${day}.${month}`] = { maxT, minT, rainProb, rainSum, wind, summary };
+                if (rainProb > 60 && rainSum > 4) {
+                    summary = "גשם משמעותי / רציף";
+                } else if (rainProb < 50 && rainSum < 2) {
+                    summary = "מעונן / ייתכן טפטוף חולף או ערפל פסגות";
+                }
+                
+                weatherMap[`${day}.${month}`] = { maxT, minT, rainProb, rainSum, wind, summary, morningProb, morningSum, noonProb, noonSum };
             }
 
             const now = new Date().getTime();
