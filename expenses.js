@@ -218,7 +218,8 @@ function renderExpenses() {
         const displayExp = [...expenses].reverse();
         displayExp.forEach(ex => {
             const sym = ex.currency === 'EUR' ? '€' : '₪';
-            const amtStr = `<span dir="ltr">${ex.amount.toFixed(1)} ${sym}</span>`;
+            const parsedAmt = parseFloat(ex.amount) || 0;
+            const amtStr = `<span dir="ltr">${parsedAmt.toFixed(1)} ${sym}</span>`;
             const dObj = new Date(ex.date);
             const dStr = `${dObj.getDate().toString().padStart(2, '0')}/${(dObj.getMonth()+1).toString().padStart(2, '0')}`;
             
