@@ -411,14 +411,15 @@ html += """
                 let summary = "שמשי ויבש, תנאים נוחים";
                 if(code >= 1 && code <= 3) summary = "עננות חלקית, שילוב של שמש ועננים";
                 if(code >= 45 && code <= 48) summary = "ערפילי (בעיקר בבוקר)";
-                if(code >= 51 && code <= 67) summary = "מעונן עם גשם קל עד בינוני";
-                if(code >= 80 && code <= 82) summary = "גשם שוטף / ממטרים חזקים";
-                if(code >= 95) summary = "סופות רעמים וגשם";
                 
-                if (rainProb > 60 && rainSum > 4) {
-                    summary = "גשם משמעותי / רציף";
-                } else if (rainProb < 50 && rainSum < 2) {
-                    summary = "מעונן / ייתכן טפטוף חולף או ערפל פסגות";
+                if (code >= 51) {
+                    if (rainProb > 60 && rainSum > 4) {
+                        summary = "גשם משמעותי / רציף";
+                    } else if (rainProb < 50 && rainSum < 2) {
+                        summary = "מעונן / ייתכן טפטוף חולף או ערפל פסגות";
+                    } else {
+                        summary = "גשם מקומי / ממטרים פזורים";
+                    }
                 }
                 
                 weatherMap[`${day}.${month}`] = { maxT, minT, rainProb, rainSum, wind, summary, morningProb, morningSum, noonProb, noonSum };
