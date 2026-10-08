@@ -291,14 +291,12 @@ html += """
     function getSmartFocus(dayNum, w) {
         let focus = [];
         
-        if (w.rainProb >= 50 || w.rainSum > 3) {
-            focus.push("יום גשום! חובה להצטייד במעיל גשם וכיסוי לתרמיל.");
+        if (w.rainProb > 60 && w.rainSum > 4) {
+            focus.push("☔ יום גשום לפניכם! חובה לקחת מעיל גשם אטום וכיסוי לתיק.");
+        } else if (w.rainProb >= 50 || w.rainSum >= 2) {
+            focus.push("🌦️ ייתכנו ממטרים פזורים. כדאי להשאיר את ציוד הגשם זמין בחלק העליון של התיק.");
         } else if (w.rainProb >= 20) {
-            focus.push("ייתכן ממטר מקומי. כדאי להחזיק ציוד גשם נגיש.");
-        }
-        
-        if (w.rainProb >= 30 || w.rainSum > 1) {
-            focus.push("מומלץ ליציאה מוקדמת כדי להימנע מממטרי אחר הצהריים.");
+            focus.push("☁️ סיכוי קל לטפטוף. ככל הנראה ההליכה תהיה יבשה ברובה.");
         }
         
         if (w.wind > 35) {
