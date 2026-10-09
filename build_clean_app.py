@@ -185,6 +185,8 @@ html = """<!DOCTYPE html>
             </ul>
         </div>
         
+        <div id="expenses-app"></div>
+        
         <div id="days-container">
 """
 
@@ -456,6 +458,7 @@ html += """
         }
     });
     </script>
+    <script src="expenses.js?v=4"></script>
 </body>
 </html>
 """
