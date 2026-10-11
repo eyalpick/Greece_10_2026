@@ -44,6 +44,7 @@
         }
         .header-card h1 { font-family: 'Outfit', sans-serif; font-size: 2.8rem; margin-bottom: 0.5rem; color: #fff; }
         .header-card p { color: var(--accent-orange); font-size: 1.3rem; font-weight: 500; }
+        
         .card {
             background: var(--bg-card);
             border: 1px solid var(--border-card);
@@ -51,8 +52,118 @@
             padding: 1.5rem;
             margin-bottom: 2rem;
         }
-        .card-header h2 { font-size: 1.7rem; color: var(--accent-orange); margin-bottom: 0.5rem; }
-        .card-header p.stats { color: var(--text-secondary); font-size: 1.1rem; margin-bottom: 1rem; border-bottom: 1px solid var(--border-card); padding-bottom: 1rem; }
+        
+        /* Accordion Day Card Styles */
+        .day-card {
+            padding: 0 !important;
+            margin-bottom: 1.25rem !important;
+            overflow: hidden;
+            border: 1px solid var(--border-card);
+            border-radius: var(--radius-md);
+            transition: border-color 0.25s, box-shadow 0.25s;
+        }
+        .day-card.active {
+            border-color: rgba(249, 115, 22, 0.5);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+        .day-card .card-header {
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.25rem 1.5rem;
+            user-select: none;
+            background: rgba(255, 255, 255, 0.02);
+            transition: background 0.2s ease;
+        }
+        .day-card .card-header:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+        .header-title-group {
+            flex: 1;
+        }
+        .day-card .card-header h2 {
+            font-size: 1.5rem;
+            color: var(--accent-orange);
+            margin-bottom: 0.35rem;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .day-subtitle {
+            color: #fff;
+            font-size: 1.35rem;
+            font-weight: 600;
+        }
+        .day-card .card-header p.stats {
+            color: var(--text-secondary);
+            font-size: 1.05rem;
+            margin-bottom: 0;
+            padding-bottom: 0;
+            border-bottom: none;
+        }
+        .toggle-icon {
+            font-size: 1.4rem;
+            color: var(--accent-orange);
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            margin-right: 1rem;
+            flex-shrink: 0;
+        }
+        .day-card.active .toggle-icon {
+            transform: rotate(180deg);
+        }
+        .day-card .card-body {
+            display: none;
+            padding: 1.25rem 1.5rem 1.5rem 1.5rem;
+            border-top: 1px solid var(--border-card);
+            animation: fadeIn 0.2s ease-in-out;
+        }
+        .day-card.active .card-body {
+            display: block;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-4px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .accordion-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.25rem;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            padding: 0 0.25rem;
+        }
+        .toggle-all-btn {
+            background: rgba(255, 255, 255, 0.06);
+            color: var(--text-primary);
+            border: 1px solid var(--border-card);
+            padding: 0.6rem 1.25rem;
+            border-radius: 8px;
+            font-size: 1.05rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-family: inherit;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .toggle-all-btn:hover {
+            background: rgba(255, 255, 255, 0.12);
+            border-color: var(--accent-orange);
+            color: var(--accent-orange);
+        }
+        .today-badge {
+            background: rgba(16, 185, 129, 0.2);
+            color: #10b981;
+            border: 1px solid #10b981;
+            font-size: 0.85rem;
+            padding: 0.2rem 0.65rem;
+            border-radius: 12px;
+            font-weight: 600;
+        }
         
         .info-block {
             background: rgba(0,0,0,0.2);
@@ -96,7 +207,10 @@
             .header-card { padding: 1.25rem 0.5rem; border-radius: 8px; margin-bottom: 1rem; }
             .header-card h1 { font-size: 1.9rem; }
             .card { padding: 1rem 0.75rem; border-radius: 8px; margin-bottom: 1.5rem; }
-            .card-header h2 { font-size: 1.4rem; }
+            .day-card .card-header { padding: 1rem 0.75rem; }
+            .day-card .card-header h2 { font-size: 1.25rem; }
+            .day-subtitle { font-size: 1.15rem; }
+            .day-card .card-body { padding: 1rem 0.75rem; }
             .info-block { padding: 1rem 0.75rem; }
         }
     </style>
@@ -126,14 +240,30 @@
         </div>
         
         <div id="expenses-app"></div>
+
+        <div class="accordion-controls">
+            <div style="color: var(--text-muted); font-size: 1.05rem;">
+                <i class="fa-solid fa-list-check"></i> ימי המסלול (לחץ על יום לפתיחה/סגירה):
+            </div>
+            <button id="toggle-all-btn" class="toggle-all-btn" onclick="toggleAllDays()">
+                <i class="fa-solid fa-angles-down"></i> פתח את כל הימים
+            </button>
+        </div>
         
         <div id="days-container">
 
-        <div class="card">
-            <div class="card-header">
-                <h2>יום 1 - 13 באוקטובר (יום ג) <span style="color:#fff; font-size:1.6rem; display:block; margin-top:0.5rem;">13:50 טיסה 16:00 נחיתה. נסיעה ל- Stemnitsa</span></h2>
-                <p class="stats">יום התארגנות / נסיעות</p>
+        <div class="card day-card" id="day-card-1" data-day-date="13.10" data-day-num="1">
+            <div class="card-header" onclick="toggleCard(1)">
+                <div class="header-title-group">
+                    <h2>
+                        <span>יום 1 - 13 באוקטובר (יום ג)</span>
+                        <span class="day-subtitle">13:50 טיסה 16:00 נחיתה. נסיעה ל- Stemnitsa</span>
+                    </h2>
+                    <p class="stats">יום התארגנות / נסיעות</p>
+                </div>
+                <i class="fa-solid fa-chevron-down toggle-icon" id="toggle-icon-1"></i>
             </div>
+            <div class="card-body">
     
             <div class="info-block weather-block weather-widget" data-date="13.10" data-daynum="1">
                 <h4><i class="fa-solid fa-cloud-sun"></i> תחזית מזג אוויר</h4>
@@ -155,13 +285,22 @@
                 <p>תשלום במקום. כולל ארוחת בוקר. מחיר: €131.5 (₪452.0)</p>
                 <a href="https://www.google.com/maps/search/?api=1&query=Mpelleiko" target="_blank" class="btn"><i class="fa-solid fa-map-pin"></i> נווט ל-Mpelleiko ב-Google Maps</a>
             </div>
-        </div>
-
-        <div class="card">
-            <div class="card-header">
-                <h2>יום 2 - 14 באוקטובר (יום ד) <span style="color:#fff; font-size:1.6rem; display:block; margin-top:0.5rem;">Stemnitsa → Dimitsana</span></h2>
-                <p class="stats">12.5 ק"מ | זמן: ~5 ש' | עלייה: ~700–825 מ' | ירידה: ~900–950 מ'</p>
+        
             </div>
+        </div>
+    
+        <div class="card day-card" id="day-card-2" data-day-date="14.10" data-day-num="2">
+            <div class="card-header" onclick="toggleCard(2)">
+                <div class="header-title-group">
+                    <h2>
+                        <span>יום 2 - 14 באוקטובר (יום ד)</span>
+                        <span class="day-subtitle">Stemnitsa → Dimitsana</span>
+                    </h2>
+                    <p class="stats">12.5 ק"מ | זמן: ~5 ש' | עלייה: ~700–825 מ' | ירידה: ~900–950 מ'</p>
+                </div>
+                <i class="fa-solid fa-chevron-down toggle-icon" id="toggle-icon-2"></i>
+            </div>
+            <div class="card-body">
     
             <div class="info-block weather-block weather-widget" data-date="14.10" data-daynum="2">
                 <h4><i class="fa-solid fa-cloud-sun"></i> תחזית מזג אוויר</h4>
@@ -188,13 +327,22 @@
                 <p>ביטול חינם 11/10 ללא ארוחת בוקר. מחיר: €130.27 (₪448.0)</p>
                 <a href="https://www.google.com/maps/search/?api=1&query=Dione+by+Open+City" target="_blank" class="btn"><i class="fa-solid fa-map-pin"></i> נווט ל-Dione by Open City ב-Google Maps</a>
             </div>
-        </div>
-
-        <div class="card">
-            <div class="card-header">
-                <h2>יום 3 - 15 באוקטובר (יום ה) <span style="color:#fff; font-size:1.6rem; display:block; margin-top:0.5rem;">Zygovisti → Elati</span></h2>
-                <p class="stats">15.0 ק"מ | זמן: ~4.5–5.5 ש' | עלייה: ~900–1,200 מ' | ירידה: ~700–1,000 מ'</p>
+        
             </div>
+        </div>
+    
+        <div class="card day-card" id="day-card-3" data-day-date="15.10" data-day-num="3">
+            <div class="card-header" onclick="toggleCard(3)">
+                <div class="header-title-group">
+                    <h2>
+                        <span>יום 3 - 15 באוקטובר (יום ה)</span>
+                        <span class="day-subtitle">Zygovisti → Elati</span>
+                    </h2>
+                    <p class="stats">15.0 ק"מ | זמן: ~4.5–5.5 ש' | עלייה: ~900–1,200 מ' | ירידה: ~700–1,000 מ'</p>
+                </div>
+                <i class="fa-solid fa-chevron-down toggle-icon" id="toggle-icon-3"></i>
+            </div>
+            <div class="card-body">
     
             <div class="info-block weather-block weather-widget" data-date="15.10" data-daynum="3">
                 <h4><i class="fa-solid fa-cloud-sun"></i> תחזית מזג אוויר</h4>
@@ -221,13 +369,22 @@
                 <p>כולל ארוחת בוקר. מחיר: €197.0 (₪678.0)</p>
                 <a href="https://www.google.com/maps/search/?api=1&query=CHALET+ELATI" target="_blank" class="btn"><i class="fa-solid fa-map-pin"></i> נווט ל-CHALET ELATI ב-Google Maps</a>
             </div>
-        </div>
-
-        <div class="card">
-            <div class="card-header">
-                <h2>יום 4 - 16 באוקטובר (יום ו) <span style="color:#fff; font-size:1.6rem; display:block; margin-top:0.5rem;">Elati → Vytina → Nymfasia</span></h2>
-                <p class="stats">14.1 ק"מ | זמן: ~4–4.5 ש' | עלייה: ~260–780 מ' | ירידה: ~560–985 מ'</p>
+        
             </div>
+        </div>
+    
+        <div class="card day-card" id="day-card-4" data-day-date="16.10" data-day-num="4">
+            <div class="card-header" onclick="toggleCard(4)">
+                <div class="header-title-group">
+                    <h2>
+                        <span>יום 4 - 16 באוקטובר (יום ו)</span>
+                        <span class="day-subtitle">Elati → Vytina → Nymfasia</span>
+                    </h2>
+                    <p class="stats">14.1 ק"מ | זמן: ~4–4.5 ש' | עלייה: ~260–780 מ' | ירידה: ~560–985 מ'</p>
+                </div>
+                <i class="fa-solid fa-chevron-down toggle-icon" id="toggle-icon-4"></i>
+            </div>
+            <div class="card-body">
     
             <div class="info-block weather-block weather-widget" data-date="16.10" data-daynum="4">
                 <h4><i class="fa-solid fa-cloud-sun"></i> תחזית מזג אוויר</h4>
@@ -254,13 +411,22 @@
                 <p>כולל ארוחת בוקר. מחיר: €212.0 (₪730.0)</p>
                 <a href="https://www.google.com/maps/search/?api=1&query=Agropoli" target="_blank" class="btn"><i class="fa-solid fa-map-pin"></i> נווט ל-Agropoli ב-Google Maps</a>
             </div>
-        </div>
-
-        <div class="card">
-            <div class="card-header">
-                <h2>יום 5 - 17 באוקטובר (יום ש) <span style="color:#fff; font-size:1.6rem; display:block; margin-top:0.5rem;">Nymfasia → Magouliana → Valtesiniko</span></h2>
-                <p class="stats">15.5 ק"מ | זמן: ~5.5–6 ש' | עלייה: ~610–1,100 מ' | ירידה: ~660–950 מ'</p>
+        
             </div>
+        </div>
+    
+        <div class="card day-card" id="day-card-5" data-day-date="17.10" data-day-num="5">
+            <div class="card-header" onclick="toggleCard(5)">
+                <div class="header-title-group">
+                    <h2>
+                        <span>יום 5 - 17 באוקטובר (יום ש)</span>
+                        <span class="day-subtitle">Nymfasia → Magouliana → Valtesiniko</span>
+                    </h2>
+                    <p class="stats">15.5 ק"מ | זמן: ~5.5–6 ש' | עלייה: ~610–1,100 מ' | ירידה: ~660–950 מ'</p>
+                </div>
+                <i class="fa-solid fa-chevron-down toggle-icon" id="toggle-icon-5"></i>
+            </div>
+            <div class="card-body">
     
             <div class="info-block weather-block weather-widget" data-date="17.10" data-daynum="5">
                 <h4><i class="fa-solid fa-cloud-sun"></i> תחזית מזג אוויר</h4>
@@ -287,13 +453,22 @@
                 <p>הזמנה בווטסאפ. כולל ארוחת בוקר. מחיר: €150.0</p>
                 <a href="https://www.google.com/maps/search/?api=1&query=Valtessiniko+Studios" target="_blank" class="btn"><i class="fa-solid fa-map-pin"></i> נווט ל-Valtessiniko Studios ב-Google Maps</a>
             </div>
-        </div>
-
-        <div class="card">
-            <div class="card-header">
-                <h2>יום 6 - 18 באוקטובר (יום א) <span style="color:#fff; font-size:1.6rem; display:block; margin-top:0.5rem;">Valtesiniko → Lagkadia</span></h2>
-                <p class="stats">13.9 ק"מ | זמן: ~5 ש' | עלייה: ~600–840 מ' | ירידה: ~700–1,020 מ'</p>
+        
             </div>
+        </div>
+    
+        <div class="card day-card" id="day-card-6" data-day-date="18.10" data-day-num="6">
+            <div class="card-header" onclick="toggleCard(6)">
+                <div class="header-title-group">
+                    <h2>
+                        <span>יום 6 - 18 באוקטובר (יום א)</span>
+                        <span class="day-subtitle">Valtesiniko → Lagkadia</span>
+                    </h2>
+                    <p class="stats">13.9 ק"מ | זמן: ~5 ש' | עלייה: ~600–840 מ' | ירידה: ~700–1,020 מ'</p>
+                </div>
+                <i class="fa-solid fa-chevron-down toggle-icon" id="toggle-icon-6"></i>
+            </div>
+            <div class="card-body">
     
             <div class="info-block weather-block weather-widget" data-date="18.10" data-daynum="6">
                 <h4><i class="fa-solid fa-cloud-sun"></i> תחזית מזג אוויר</h4>
@@ -320,13 +495,22 @@
                 <p>תשלום במקום. כולל ארוחת בוקר. מחיר: €191.9 (₪661.0)</p>
                 <a href="https://www.google.com/maps/search/?api=1&query=Lagadia+4+Seasons+Hotel" target="_blank" class="btn"><i class="fa-solid fa-map-pin"></i> נווט ל-Lagadia 4 Seasons Hotel ב-Google Maps</a>
             </div>
-        </div>
-
-        <div class="card">
-            <div class="card-header">
-                <h2>יום 7 - 19 באוקטובר (יום ב) <span style="color:#fff; font-size:1.6rem; display:block; margin-top:0.5rem;">לגקאדיה ← נמאה ← ורחאטי/לוטראקי</span></h2>
-                <p class="stats">כ-2.5 שעות עד לחוף</p>
+        
             </div>
+        </div>
+    
+        <div class="card day-card" id="day-card-7" data-day-date="19.10" data-day-num="7">
+            <div class="card-header" onclick="toggleCard(7)">
+                <div class="header-title-group">
+                    <h2>
+                        <span>יום 7 - 19 באוקטובר (יום ב)</span>
+                        <span class="day-subtitle">לגקאדיה ← נמאה ← ורחאטי/לוטראקי</span>
+                    </h2>
+                    <p class="stats">כ-2.5 שעות עד לחוף</p>
+                </div>
+                <i class="fa-solid fa-chevron-down toggle-icon" id="toggle-icon-7"></i>
+            </div>
+            <div class="card-body">
     
             <div class="info-block weather-block weather-widget" data-date="19.10" data-daynum="7">
                 <h4><i class="fa-solid fa-cloud-sun"></i> תחזית מזג אוויר</h4>
@@ -353,13 +537,22 @@
                 <p>לילה ראשון בריזורט יוקרתי (למשל Alkyon או Wyndham) בתקציב כ-100-120 אירו ללילה</p>
                 <a href="https://www.google.com/maps/search/?api=1&query=מלון+ספא+ב-Vrachati+או+לוטראקי" target="_blank" class="btn"><i class="fa-solid fa-map-pin"></i> נווט ל-מלון ספא ב-Vrachati או לוטראקי ב-Google Maps</a>
             </div>
-        </div>
-
-        <div class="card">
-            <div class="card-header">
-                <h2>יום 8 - 20 באוקטובר (יום ג) <span style="color:#fff; font-size:1.6rem; display:block; margin-top:0.5rem;">קורינתוס העתיקה ואוסיוס פטאפיוס</span></h2>
-                <p class="stats">נסיעות קצרות של 15-20 דקות בין האתרים</p>
+        
             </div>
+        </div>
+    
+        <div class="card day-card" id="day-card-8" data-day-date="20.10" data-day-num="8">
+            <div class="card-header" onclick="toggleCard(8)">
+                <div class="header-title-group">
+                    <h2>
+                        <span>יום 8 - 20 באוקטובר (יום ג)</span>
+                        <span class="day-subtitle">קורינתוס העתיקה ואוסיוס פטאפיוס</span>
+                    </h2>
+                    <p class="stats">נסיעות קצרות של 15-20 דקות בין האתרים</p>
+                </div>
+                <i class="fa-solid fa-chevron-down toggle-icon" id="toggle-icon-8"></i>
+            </div>
+            <div class="card-body">
     
             <div class="info-block weather-block weather-widget" data-date="20.10" data-daynum="8">
                 <h4><i class="fa-solid fa-cloud-sun"></i> תחזית מזג אוויר</h4>
@@ -386,13 +579,22 @@
                 <p>לילה שני באותו ריזורט</p>
                 <a href="https://www.google.com/maps/search/?api=1&query=מלון+ספא+ב-Vrachati+או+לוטראקי" target="_blank" class="btn"><i class="fa-solid fa-map-pin"></i> נווט ל-מלון ספא ב-Vrachati או לוטראקי ב-Google Maps</a>
             </div>
-        </div>
-
-        <div class="card">
-            <div class="card-header">
-                <h2>יום 9 - 21 באוקטובר (יום ד) <span style="color:#fff; font-size:1.6rem; display:block; margin-top:0.5rem;">הריביירה האתונאית וכף סוניון</span></h2>
-                <p class="stats">כ-3 שעות נהיגה מצטברות</p>
+        
             </div>
+        </div>
+    
+        <div class="card day-card" id="day-card-9" data-day-date="21.10" data-day-num="9">
+            <div class="card-header" onclick="toggleCard(9)">
+                <div class="header-title-group">
+                    <h2>
+                        <span>יום 9 - 21 באוקטובר (יום ד)</span>
+                        <span class="day-subtitle">הריביירה האתונאית וכף סוניון</span>
+                    </h2>
+                    <p class="stats">כ-3 שעות נהיגה מצטברות</p>
+                </div>
+                <i class="fa-solid fa-chevron-down toggle-icon" id="toggle-icon-9"></i>
+            </div>
+            <div class="card-body">
     
             <div class="info-block weather-block weather-widget" data-date="21.10" data-daynum="9">
                 <h4><i class="fa-solid fa-cloud-sun"></i> תחזית מזג אוויר</h4>
@@ -419,13 +621,22 @@
                 <p>מלון נוח לשינה בלבד לקראת הטיסה (Spata או מרקופולו)</p>
                 <a href="https://www.google.com/maps/search/?api=1&query=מלון+ליד+שדה+התעופה" target="_blank" class="btn"><i class="fa-solid fa-map-pin"></i> נווט ל-מלון ליד שדה התעופה ב-Google Maps</a>
             </div>
-        </div>
-
-        <div class="card">
-            <div class="card-header">
-                <h2>יום 10 - 22 באוקטובר (יום ה) <span style="color:#fff; font-size:1.6rem; display:block; margin-top:0.5rem;">11:10 המראה לישראל</span></h2>
-                <p class="stats">נסיעה קצרצרה לשדה</p>
+        
             </div>
+        </div>
+    
+        <div class="card day-card" id="day-card-10" data-day-date="22.10" data-day-num="10">
+            <div class="card-header" onclick="toggleCard(10)">
+                <div class="header-title-group">
+                    <h2>
+                        <span>יום 10 - 22 באוקטובר (יום ה)</span>
+                        <span class="day-subtitle">11:10 המראה לישראל</span>
+                    </h2>
+                    <p class="stats">נסיעה קצרצרה לשדה</p>
+                </div>
+                <i class="fa-solid fa-chevron-down toggle-icon" id="toggle-icon-10"></i>
+            </div>
+            <div class="card-body">
     
             <div class="info-block weather-block weather-widget" data-date="22.10" data-daynum="10">
                 <h4><i class="fa-solid fa-cloud-sun"></i> תחזית מזג אוויר</h4>
@@ -446,12 +657,80 @@
                 <h4><i class="fa-solid fa-map-location-dot"></i> פירוט המסלול</h4>
                 <p><strong>חוזרים הביתה</strong><br>קימה קלה, הגעה לשדה התעופה בסביבות 08:30 לקראת טיסת הבוקר לישראל. החזרת הרכב וטיסה נעימה!<br><br></p>
             </div>
+        
+            </div>
         </div>
-
+    
         </div>
     </div>
     
     <script>
+    function toggleCard(dayNum) {
+        const card = document.getElementById('day-card-' + dayNum);
+        if (card) {
+            card.classList.toggle('active');
+        }
+        updateToggleAllBtn();
+    }
+
+    function toggleAllDays() {
+        const cards = document.querySelectorAll('.day-card');
+        const anyClosed = Array.from(cards).some(c => !c.classList.contains('active'));
+        cards.forEach(c => {
+            if (anyClosed) {
+                c.classList.add('active');
+            } else {
+                c.classList.remove('active');
+            }
+        });
+        updateToggleAllBtn();
+    }
+
+    function updateToggleAllBtn() {
+        const cards = document.querySelectorAll('.day-card');
+        const btn = document.getElementById('toggle-all-btn');
+        if (!btn || cards.length === 0) return;
+        const allActive = Array.from(cards).every(c => c.classList.contains('active'));
+        if (allActive) {
+            btn.innerHTML = '<i class="fa-solid fa-angles-up"></i> סגור את כל הימים';
+        } else {
+            btn.innerHTML = '<i class="fa-solid fa-angles-down"></i> פתח את כל הימים';
+        }
+    }
+
+    function autoOpenToday() {
+        const today = new Date();
+        const day = today.getDate();
+        const month = today.getMonth() + 1; // 10 = Oct
+        const todayKey = day + '.10';
+        
+        let targetCard = null;
+        if (month === 10 && day >= 13 && day <= 22) {
+            targetCard = document.querySelector('.day-card[data-day-date="' + todayKey + '"]');
+        }
+        
+        if (targetCard) {
+            targetCard.classList.add('active');
+            const h2 = targetCard.querySelector('.header-title-group h2');
+            if (h2) {
+                const badge = document.createElement('span');
+                badge.className = 'today-badge';
+                badge.innerHTML = '<i class="fa-solid fa-location-dot"></i> היום';
+                h2.prepend(badge);
+            }
+            setTimeout(() => {
+                targetCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }, 300);
+        } else {
+            // Before or after trip, open Day 1 by default so the screen is not completely closed
+            const firstCard = document.querySelector('.day-card');
+            if (firstCard) {
+                firstCard.classList.add('active');
+            }
+        }
+        updateToggleAllBtn();
+    }
+
     function getSmartFocus(dayNum, w) {
         let focus = [];
         
@@ -528,7 +807,6 @@
         btn.disabled = true;
 
         try {
-            // Using elevation=1000 for Arcadia mountains to get accurate cold/wind models
             const response = await fetch("https://api.open-meteo.com/v1/forecast?latitude=37.595&longitude=22.04&elevation=1000&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max,precipitation_sum,wind_speed_10m_max&hourly=precipitation_probability,precipitation&timezone=auto&forecast_days=16");
             const data = await response.json();
             
@@ -609,8 +887,10 @@
         }
     }
 
-    // Load saved weather on startup
+    // Load saved weather on startup & auto-open today
     window.addEventListener('DOMContentLoaded', () => {
+        autoOpenToday();
+        
         const savedWeather = localStorage.getItem('menalon_weather');
         const savedTime = localStorage.getItem('menalon_weather_time');
         if (savedWeather) {

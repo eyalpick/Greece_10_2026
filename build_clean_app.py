@@ -104,6 +104,7 @@ html = """<!DOCTYPE html>
         }
         .header-card h1 { font-family: 'Outfit', sans-serif; font-size: 2.8rem; margin-bottom: 0.5rem; color: #fff; }
         .header-card p { color: var(--accent-orange); font-size: 1.3rem; font-weight: 500; }
+        
         .card {
             background: var(--bg-card);
             border: 1px solid var(--border-card);
@@ -111,8 +112,118 @@ html = """<!DOCTYPE html>
             padding: 1.5rem;
             margin-bottom: 2rem;
         }
-        .card-header h2 { font-size: 1.7rem; color: var(--accent-orange); margin-bottom: 0.5rem; }
-        .card-header p.stats { color: var(--text-secondary); font-size: 1.1rem; margin-bottom: 1rem; border-bottom: 1px solid var(--border-card); padding-bottom: 1rem; }
+        
+        /* Accordion Day Card Styles */
+        .day-card {
+            padding: 0 !important;
+            margin-bottom: 1.25rem !important;
+            overflow: hidden;
+            border: 1px solid var(--border-card);
+            border-radius: var(--radius-md);
+            transition: border-color 0.25s, box-shadow 0.25s;
+        }
+        .day-card.active {
+            border-color: rgba(249, 115, 22, 0.5);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+        .day-card .card-header {
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.25rem 1.5rem;
+            user-select: none;
+            background: rgba(255, 255, 255, 0.02);
+            transition: background 0.2s ease;
+        }
+        .day-card .card-header:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+        .header-title-group {
+            flex: 1;
+        }
+        .day-card .card-header h2 {
+            font-size: 1.5rem;
+            color: var(--accent-orange);
+            margin-bottom: 0.35rem;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .day-subtitle {
+            color: #fff;
+            font-size: 1.35rem;
+            font-weight: 600;
+        }
+        .day-card .card-header p.stats {
+            color: var(--text-secondary);
+            font-size: 1.05rem;
+            margin-bottom: 0;
+            padding-bottom: 0;
+            border-bottom: none;
+        }
+        .toggle-icon {
+            font-size: 1.4rem;
+            color: var(--accent-orange);
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            margin-right: 1rem;
+            flex-shrink: 0;
+        }
+        .day-card.active .toggle-icon {
+            transform: rotate(180deg);
+        }
+        .day-card .card-body {
+            display: none;
+            padding: 1.25rem 1.5rem 1.5rem 1.5rem;
+            border-top: 1px solid var(--border-card);
+            animation: fadeIn 0.2s ease-in-out;
+        }
+        .day-card.active .card-body {
+            display: block;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-4px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .accordion-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.25rem;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            padding: 0 0.25rem;
+        }
+        .toggle-all-btn {
+            background: rgba(255, 255, 255, 0.06);
+            color: var(--text-primary);
+            border: 1px solid var(--border-card);
+            padding: 0.6rem 1.25rem;
+            border-radius: 8px;
+            font-size: 1.05rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-family: inherit;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .toggle-all-btn:hover {
+            background: rgba(255, 255, 255, 0.12);
+            border-color: var(--accent-orange);
+            color: var(--accent-orange);
+        }
+        .today-badge {
+            background: rgba(16, 185, 129, 0.2);
+            color: #10b981;
+            border: 1px solid #10b981;
+            font-size: 0.85rem;
+            padding: 0.2rem 0.65rem;
+            border-radius: 12px;
+            font-weight: 600;
+        }
         
         .info-block {
             background: rgba(0,0,0,0.2);
@@ -156,7 +267,10 @@ html = """<!DOCTYPE html>
             .header-card { padding: 1.25rem 0.5rem; border-radius: 8px; margin-bottom: 1rem; }
             .header-card h1 { font-size: 1.9rem; }
             .card { padding: 1rem 0.75rem; border-radius: 8px; margin-bottom: 1.5rem; }
-            .card-header h2 { font-size: 1.4rem; }
+            .day-card .card-header { padding: 1rem 0.75rem; }
+            .day-card .card-header h2 { font-size: 1.25rem; }
+            .day-subtitle { font-size: 1.15rem; }
+            .day-card .card-body { padding: 1rem 0.75rem; }
             .info-block { padding: 1rem 0.75rem; }
         }
     </style>
@@ -186,6 +300,15 @@ html = """<!DOCTYPE html>
         </div>
         
         <div id="expenses-app"></div>
+
+        <div class="accordion-controls">
+            <div style="color: var(--text-muted); font-size: 1.05rem;">
+                <i class="fa-solid fa-list-check"></i> ימי המסלול (לחץ על יום לפתיחה/סגירה):
+            </div>
+            <button id="toggle-all-btn" class="toggle-all-btn" onclick="toggleAllDays()">
+                <i class="fa-solid fa-angles-down"></i> פתח את כל הימים
+            </button>
+        </div>
         
         <div id="days-container">
 """
@@ -195,8 +318,6 @@ for day in df:
     date_text = day.get("dateText", "")
     title_he = day.get("titleHe", "יום התארגנות")
     
-    # Extract date_int (e.g. 13 from "13 באוקטובר")
-    import re
     date_int_match = re.search(r'\d+', date_text)
     date_int = int(date_int_match.group()) if date_int_match else 0
     
@@ -213,11 +334,18 @@ for day in df:
     activities = day.get("activities", [])
     
     html += f'''
-        <div class="card">
-            <div class="card-header">
-                <h2>יום {day_num} - {date_text} <span style="color:#fff; font-size:1.6rem; display:block; margin-top:0.5rem;">{title_he}</span></h2>
-                <p class="stats">{drive_time_html}</p>
+        <div class="card day-card" id="day-card-{day_num}" data-day-date="{date_int}.10" data-day-num="{day_num}">
+            <div class="card-header" onclick="toggleCard({day_num})">
+                <div class="header-title-group">
+                    <h2>
+                        <span>יום {day_num} - {date_text}</span>
+                        <span class="day-subtitle">{title_he}</span>
+                    </h2>
+                    <p class="stats">{drive_time_html}</p>
+                </div>
+                <i class="fa-solid fa-chevron-down toggle-icon" id="toggle-icon-{day_num}"></i>
             </div>
+            <div class="card-body">
     '''
     
     w_data = MANUAL_WEATHER.get(date_int)
@@ -256,7 +384,6 @@ for day in df:
             </div>
         '''
 
-    # Handle multiple activities or legacy pdf_info
     pdf_info = day_texts.get(day_num - 1, "")
     desc_text = ""
     for act in activities:
@@ -283,13 +410,82 @@ for day in df:
             </div>
         '''
         
-    html += '</div>\n'
+    html += '''
+            </div>
+        </div>
+    '''
 
 html += """
         </div>
     </div>
     
     <script>
+    function toggleCard(dayNum) {
+        const card = document.getElementById('day-card-' + dayNum);
+        if (card) {
+            card.classList.toggle('active');
+        }
+        updateToggleAllBtn();
+    }
+
+    function toggleAllDays() {
+        const cards = document.querySelectorAll('.day-card');
+        const anyClosed = Array.from(cards).some(c => !c.classList.contains('active'));
+        cards.forEach(c => {
+            if (anyClosed) {
+                c.classList.add('active');
+            } else {
+                c.classList.remove('active');
+            }
+        });
+        updateToggleAllBtn();
+    }
+
+    function updateToggleAllBtn() {
+        const cards = document.querySelectorAll('.day-card');
+        const btn = document.getElementById('toggle-all-btn');
+        if (!btn || cards.length === 0) return;
+        const allActive = Array.from(cards).every(c => c.classList.contains('active'));
+        if (allActive) {
+            btn.innerHTML = '<i class="fa-solid fa-angles-up"></i> סגור את כל הימים';
+        } else {
+            btn.innerHTML = '<i class="fa-solid fa-angles-down"></i> פתח את כל הימים';
+        }
+    }
+
+    function autoOpenToday() {
+        const today = new Date();
+        const day = today.getDate();
+        const month = today.getMonth() + 1; // 10 = Oct
+        const todayKey = day + '.10';
+        
+        let targetCard = null;
+        if (month === 10 && day >= 13 && day <= 22) {
+            targetCard = document.querySelector('.day-card[data-day-date="' + todayKey + '"]');
+        }
+        
+        if (targetCard) {
+            targetCard.classList.add('active');
+            const h2 = targetCard.querySelector('.header-title-group h2');
+            if (h2) {
+                const badge = document.createElement('span');
+                badge.className = 'today-badge';
+                badge.innerHTML = '<i class="fa-solid fa-location-dot"></i> היום';
+                h2.prepend(badge);
+            }
+            setTimeout(() => {
+                targetCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }, 300);
+        } else {
+            // Before or after trip, open Day 1 by default so the screen is not completely closed
+            const firstCard = document.querySelector('.day-card');
+            if (firstCard) {
+                firstCard.classList.add('active');
+            }
+        }
+        updateToggleAllBtn();
+    }
+
     function getSmartFocus(dayNum, w) {
         let focus = [];
         
@@ -366,7 +562,6 @@ html += """
         btn.disabled = true;
 
         try {
-            // Using elevation=1000 for Arcadia mountains to get accurate cold/wind models
             const response = await fetch("https://api.open-meteo.com/v1/forecast?latitude=37.595&longitude=22.04&elevation=1000&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max,precipitation_sum,wind_speed_10m_max&hourly=precipitation_probability,precipitation&timezone=auto&forecast_days=16");
             const data = await response.json();
             
@@ -447,8 +642,10 @@ html += """
         }
     }
 
-    // Load saved weather on startup
+    // Load saved weather on startup & auto-open today
     window.addEventListener('DOMContentLoaded', () => {
+        autoOpenToday();
+        
         const savedWeather = localStorage.getItem('menalon_weather');
         const savedTime = localStorage.getItem('menalon_weather_time');
         if (savedWeather) {
