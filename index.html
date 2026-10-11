@@ -72,9 +72,14 @@
             justify-content: space-between;
             align-items: center;
             padding: 1.25rem 1.5rem;
-            user-select: none;
             background: rgba(255, 255, 255, 0.02);
             transition: background 0.2s ease;
+            -webkit-tap-highlight-color: rgba(249, 115, 22, 0.25);
+            touch-action: manipulation;
+            outline: none;
+        }
+        .day-card .card-header * {
+            pointer-events: none;
         }
         .day-card .card-header:hover {
             background: rgba(255, 255, 255, 0.05);
@@ -207,7 +212,15 @@
             .header-card { padding: 1.25rem 0.5rem; border-radius: 8px; margin-bottom: 1rem; }
             .header-card h1 { font-size: 1.9rem; }
             .card { padding: 1rem 0.75rem; border-radius: 8px; margin-bottom: 1.5rem; }
-            .day-card .card-header { padding: 1rem 0.75rem; }
+            .day-card .card-header {
+                padding: 1rem 0.75rem !important;
+                touch-action: manipulation !important;
+                cursor: pointer !important;
+                -webkit-tap-highlight-color: rgba(249, 115, 22, 0.25) !important;
+            }
+            .day-card .card-header * {
+                pointer-events: none !important;
+            }
             .day-card .card-header h2 { font-size: 1.25rem; }
             .day-subtitle { font-size: 1.15rem; }
             .day-card .card-body { padding: 1rem 0.75rem; }
@@ -253,7 +266,7 @@
         <div id="days-container">
 
         <div class="card day-card" id="day-card-1" data-day-date="13.10" data-day-num="1">
-            <div class="card-header" onclick="toggleCard(1)">
+            <div class="card-header" role="button" tabindex="0" id="header-1">
                 <div class="header-title-group">
                     <h2>
                         <span>יום 1 - 13 באוקטובר (יום ג)</span>
@@ -290,7 +303,7 @@
         </div>
     
         <div class="card day-card" id="day-card-2" data-day-date="14.10" data-day-num="2">
-            <div class="card-header" onclick="toggleCard(2)">
+            <div class="card-header" role="button" tabindex="0" id="header-2">
                 <div class="header-title-group">
                     <h2>
                         <span>יום 2 - 14 באוקטובר (יום ד)</span>
@@ -332,7 +345,7 @@
         </div>
     
         <div class="card day-card" id="day-card-3" data-day-date="15.10" data-day-num="3">
-            <div class="card-header" onclick="toggleCard(3)">
+            <div class="card-header" role="button" tabindex="0" id="header-3">
                 <div class="header-title-group">
                     <h2>
                         <span>יום 3 - 15 באוקטובר (יום ה)</span>
@@ -374,7 +387,7 @@
         </div>
     
         <div class="card day-card" id="day-card-4" data-day-date="16.10" data-day-num="4">
-            <div class="card-header" onclick="toggleCard(4)">
+            <div class="card-header" role="button" tabindex="0" id="header-4">
                 <div class="header-title-group">
                     <h2>
                         <span>יום 4 - 16 באוקטובר (יום ו)</span>
@@ -416,7 +429,7 @@
         </div>
     
         <div class="card day-card" id="day-card-5" data-day-date="17.10" data-day-num="5">
-            <div class="card-header" onclick="toggleCard(5)">
+            <div class="card-header" role="button" tabindex="0" id="header-5">
                 <div class="header-title-group">
                     <h2>
                         <span>יום 5 - 17 באוקטובר (יום ש)</span>
@@ -458,7 +471,7 @@
         </div>
     
         <div class="card day-card" id="day-card-6" data-day-date="18.10" data-day-num="6">
-            <div class="card-header" onclick="toggleCard(6)">
+            <div class="card-header" role="button" tabindex="0" id="header-6">
                 <div class="header-title-group">
                     <h2>
                         <span>יום 6 - 18 באוקטובר (יום א)</span>
@@ -500,7 +513,7 @@
         </div>
     
         <div class="card day-card" id="day-card-7" data-day-date="19.10" data-day-num="7">
-            <div class="card-header" onclick="toggleCard(7)">
+            <div class="card-header" role="button" tabindex="0" id="header-7">
                 <div class="header-title-group">
                     <h2>
                         <span>יום 7 - 19 באוקטובר (יום ב)</span>
@@ -542,7 +555,7 @@
         </div>
     
         <div class="card day-card" id="day-card-8" data-day-date="20.10" data-day-num="8">
-            <div class="card-header" onclick="toggleCard(8)">
+            <div class="card-header" role="button" tabindex="0" id="header-8">
                 <div class="header-title-group">
                     <h2>
                         <span>יום 8 - 20 באוקטובר (יום ג)</span>
@@ -584,7 +597,7 @@
         </div>
     
         <div class="card day-card" id="day-card-9" data-day-date="21.10" data-day-num="9">
-            <div class="card-header" onclick="toggleCard(9)">
+            <div class="card-header" role="button" tabindex="0" id="header-9">
                 <div class="header-title-group">
                     <h2>
                         <span>יום 9 - 21 באוקטובר (יום ד)</span>
@@ -626,7 +639,7 @@
         </div>
     
         <div class="card day-card" id="day-card-10" data-day-date="22.10" data-day-num="10">
-            <div class="card-header" onclick="toggleCard(10)">
+            <div class="card-header" role="button" tabindex="0" id="header-10">
                 <div class="header-title-group">
                     <h2>
                         <span>יום 10 - 22 באוקטובר (יום ה)</span>
@@ -665,12 +678,50 @@
     </div>
     
     <script>
-    function toggleCard(dayNum) {
+    function toggleCard(dayNum, event) {
+        if (event) {
+            event.stopPropagation();
+        }
         const card = document.getElementById('day-card-' + dayNum);
         if (card) {
             card.classList.toggle('active');
         }
         updateToggleAllBtn();
+    }
+
+    function setupAccordionEvents() {
+        document.querySelectorAll('.day-card .card-header').forEach(header => {
+            // Direct click listener
+            header.addEventListener('click', function(e) {
+                e.stopPropagation();
+                const card = this.closest('.day-card');
+                if (card) {
+                    card.classList.toggle('active');
+                    updateToggleAllBtn();
+                }
+            });
+
+            // Mobile touch tap detection
+            let touchStartY = 0;
+            let touchStartX = 0;
+            header.addEventListener('touchstart', function(e) {
+                touchStartY = e.touches[0].clientY;
+                touchStartX = e.touches[0].clientX;
+            }, { passive: true });
+
+            header.addEventListener('touchend', function(e) {
+                const touchEndY = e.changedTouches[0].clientY;
+                const touchEndX = e.changedTouches[0].clientX;
+                if (Math.abs(touchEndY - touchStartY) < 14 && Math.abs(touchEndX - touchStartX) < 14) {
+                    e.preventDefault();
+                    const card = this.closest('.day-card');
+                    if (card) {
+                        card.classList.toggle('active');
+                        updateToggleAllBtn();
+                    }
+                }
+            });
+        });
     }
 
     function toggleAllDays() {
@@ -738,7 +789,7 @@
         if (isRealRain && w.rainSum > 4 && w.rainProb > 60) {
             focus.push("☔ יום גשום לפניכם! חובה לקחת מעיל גשם אטום וכיסוי לתיק.");
         } else if (isRealRain && w.rainSum >= 2) {
-            focus.push("🌦️ ייתכנו ממטרים פזורים (מעל 2 מ"מ). כדאי להשאיר את ציוד הגשם זמין בחלק העליון של התיק.");
+            focus.push('🌦️ ייתכנו ממטרים פזורים (מעל 2 מ"מ). כדאי להשאיר את ציוד הגשם זמין בחלק העליון של התיק.');
         } else if (isRealRain) {
             focus.push("☁️ ייתכן גשם מקומי קל. מומלץ להחזיק מעיל גשם זמין.");
         }
@@ -905,8 +956,9 @@
         }
     }
 
-    // Load saved weather on startup & auto-open today
+    // Load saved weather on startup & auto-open today & setup mobile events
     window.addEventListener('DOMContentLoaded', () => {
+        setupAccordionEvents();
         autoOpenToday();
         
         const savedWeather = localStorage.getItem('menalon_weather');

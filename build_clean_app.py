@@ -132,9 +132,14 @@ html = """<!DOCTYPE html>
             justify-content: space-between;
             align-items: center;
             padding: 1.25rem 1.5rem;
-            user-select: none;
             background: rgba(255, 255, 255, 0.02);
             transition: background 0.2s ease;
+            -webkit-tap-highlight-color: rgba(249, 115, 22, 0.25);
+            touch-action: manipulation;
+            outline: none;
+        }
+        .day-card .card-header * {
+            pointer-events: none;
         }
         .day-card .card-header:hover {
             background: rgba(255, 255, 255, 0.05);
@@ -267,7 +272,15 @@ html = """<!DOCTYPE html>
             .header-card { padding: 1.25rem 0.5rem; border-radius: 8px; margin-bottom: 1rem; }
             .header-card h1 { font-size: 1.9rem; }
             .card { padding: 1rem 0.75rem; border-radius: 8px; margin-bottom: 1.5rem; }
-            .day-card .card-header { padding: 1rem 0.75rem; }
+            .day-card .card-header {
+                padding: 1rem 0.75rem !important;
+                touch-action: manipulation !important;
+                cursor: pointer !important;
+                -webkit-tap-highlight-color: rgba(249, 115, 22, 0.25) !important;
+            }
+            .day-card .card-header * {
+                pointer-events: none !important;
+            }
             .day-card .card-header h2 { font-size: 1.25rem; }
             .day-subtitle { font-size: 1.15rem; }
             .day-card .card-body { padding: 1rem 0.75rem; }
@@ -335,7 +348,7 @@ for day in df:
     
     html += f'''
         <div class="card day-card" id="day-card-{day_num}" data-day-date="{date_int}.10" data-day-num="{day_num}">
-            <div class="card-header" onclick="toggleCard({day_num})">
+            <div class="card-header" role="button" tabindex="0" id="header-{day_num}">
                 <div class="header-title-group">
                     <h2>
                         <span>יום {day_num} - {date_text}</span>
@@ -420,12 +433,50 @@ html += """
     </div>
     
     <script>
-    function toggleCard(dayNum) {
+    function toggleCard(dayNum, event) {
+        if (event) {
+            event.stopPropagation();
+        }
         const card = document.getElementById('day-card-' + dayNum);
         if (card) {
             card.classList.toggle('active');
         }
         updateToggleAllBtn();
+    }
+
+    function setupAccordionEvents() {
+        document.querySelectorAll('.day-card .card-header').forEach(header => {
+            // Direct click listener
+            header.addEventListener('click', function(e) {
+                e.stopPropagation();
+                const card = this.closest('.day-card');
+                if (card) {
+                    card.classList.toggle('active');
+                    updateToggleAllBtn();
+                }
+            });
+
+            // Mobile touch tap detection
+            let touchStartY = 0;
+            let touchStartX = 0;
+            header.addEventListener('touchstart', function(e) {
+                touchStartY = e.touches[0].clientY;
+                touchStartX = e.touches[0].clientX;
+            }, { passive: true });
+
+            header.addEventListener('touchend', function(e) {
+                const touchEndY = e.changedTouches[0].clientY;
+                const touchEndX = e.changedTouches[0].clientX;
+                if (Math.abs(touchEndY - touchStartY) < 14 && Math.abs(touchEndX - touchStartX) < 14) {
+                    e.preventDefault();
+                    const card = this.closest('.day-card');
+                    if (card) {
+                        card.classList.toggle('active');
+                        updateToggleAllBtn();
+                    }
+                }
+            });
+        });
     }
 
     function toggleAllDays() {
@@ -493,7 +544,7 @@ html += """
         if (isRealRain && w.rainSum > 4 && w.rainProb > 60) {
             focus.push("☔ יום גשום לפניכם! חובה לקחת מעיל גשם אטום וכיסוי לתיק.");
         } else if (isRealRain && w.rainSum >= 2) {
-            focus.push("🌦️ ייתכנו ממטרים פזורים (מעל 2 מ\"מ). כדאי להשאיר את ציוד הגשם זמין בחלק העליון של התיק.");
+            focus.push('🌦️ ייתכנו ממטרים פזורים (מעל 2 מ"מ). כדאי להשאיר את ציוד הגשם זמין בחלק העליון של התיק.');
         } else if (isRealRain) {
             focus.push("☁️ ייתכן גשם מקומי קל. מומלץ להחזיק מעיל גשם זמין.");
         }
@@ -660,8 +711,9 @@ html += """
         }
     }
 
-    // Load saved weather on startup & auto-open today
+    // Load saved weather on startup & auto-open today & setup mobile events
     window.addEventListener('DOMContentLoaded', () => {
+        setupAccordionEvents();
         autoOpenToday();
         
         const savedWeather = localStorage.getItem('menalon_weather');
