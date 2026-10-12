@@ -186,11 +186,11 @@ const itineraryData = [
         "driveTime": "כ-3 שעות נהיגה מצטברות",
         "weatherText": "15°C / 8°C",
         "lodging": {
-            "nameHe": "מלון ליד שדה התעופה",
-            "nameEn": "Airport Area Hotel",
-            "desc": "מלון נוח לשינה בלבד לקראת הטיסה (Spata או מרקופולו)",
+            "nameHe": "DREAM & HARMONY",
+            "nameEn": "DREAM & HARMONY",
+            "desc": "ביטול 14/10. ללא ארוחת בוקר. מחיר: €79.8 (₪273.0)",
             "bookingUrl": "",
-            "mapsUrl": ""
+            "mapsUrl": "https://www.google.com/maps/search/?api=1&query=DREAM+%26+HARMONY"
         },
         "eatsHe": "אוכל והצטיידות",
         "eatsDesc": "עצירות ספונטניות לאורך הריביירה. ארוחת ערב מאוחרת באזור סוניון/לבריו",
