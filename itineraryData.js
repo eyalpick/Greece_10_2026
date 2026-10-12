@@ -151,7 +151,7 @@ const itineraryData = [
         "activities": [
             {
                 "title": "נמאה (יקב בוטיק) והגעה לריזורט",
-                "desc": "09:00 יציאה מלגקאדיה. ב-11:30 עצירה באזור נמאה לסיור מודרך וטעימות ביקב יחיד (Semeli, Skouras או Palivou). סביב 15:30 הגעה למלון למנוחה ורחצה בבריכות המחוממות."
+                "desc": "09:00 יציאה מלגקאדיה. ב-11:30 עצירה באזור נמאה לסיור מודרך וטעימות ביקב <strong>Ktima Palivou, Nemea</strong> (יקב פאליבו).<br><a href=\"https://www.google.com/maps/search/?api=1&query=Ktima+Palivou,+Nemea\" target=\"_blank\" class=\"btn\" style=\"background:rgba(249,115,22,0.2); border:1px solid var(--accent-orange); color:#fff; font-size:0.95rem; margin-top:8px; display:inline-block;\"><i class=\"fa-solid fa-map-pin\" style=\"color:var(--accent-orange);\"></i> נווט ל-Ktima Palivou ב-Google Maps</a><br><br>סביב 15:30 הגעה למלון למנוחה ורחצה בבריכות המחוממות."
             }
         ]
     },
