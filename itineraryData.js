@@ -75,7 +75,7 @@ const itineraryData = [
             "nameEn": "Agropoli",
             "desc": "כולל ארוחת בוקר. מחיר: €212.0 (₪730.0)",
             "bookingUrl": "",
-            "mapsUrl": "https://www.google.com/maps/search/?api=1&query=Agropoli"
+            "mapsUrl": "https://maps.app.goo.gl/cZW3v4rmihzFSRcn6"
         },
         "eatsHe": "אוכל והצטיידות",
         "eatsDesc": "אחרי כ-8.5 ק\"מ של הליכה נעימה מגיעים למרכז ויטינה (Vytina) – הכפר הגדול ביותר באזור, המלא בטברנות, בתי קפה ומאפיות. רוב המטיילים עוצרים כאן לארוחת צהריים מסודרת לפני שממשיכים את 5.5 הק\"מ הנותרים לנימפאסיה. ויטינה (יום 3): סופרמרקטים ומאפיות להצטיידות עשירה.",
@@ -190,7 +190,7 @@ const itineraryData = [
             "nameEn": "DREAM & HARMONY",
             "desc": "ביטול 14/10. ללא ארוחת בוקר. מחיר: €79.8 (₪273.0)",
             "bookingUrl": "",
-            "mapsUrl": "https://www.google.com/maps/search/?api=1&query=DREAM+%26+HARMONY"
+            "mapsUrl": "https://maps.app.goo.gl/myZywHGRf2waHSSy5"
         },
         "eatsHe": "אוכל והצטיידות",
         "eatsDesc": "עצירות ספונטניות לאורך הריביירה. ארוחת ערב מאוחרת באזור סוניון/לבריו",

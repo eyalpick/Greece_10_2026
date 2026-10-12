@@ -339,9 +339,11 @@ for day in df:
     hotel_info = day.get("lodging")
     hotel = ""
     hotel_notes = ""
+    hotel_maps = ""
     if hotel_info:
         hotel = hotel_info.get("nameHe", "")
         hotel_notes = hotel_info.get("desc", "")
+        hotel_maps = hotel_info.get("mapsUrl", "")
     
     eats = day.get("eatsDesc", "")
     activities = day.get("activities", [])
@@ -414,7 +416,7 @@ for day in df:
         '''
         
     if hotel:
-        maps_link = f"https://www.google.com/maps/search/?api=1&query={hotel.replace(' ', '+')}"
+        maps_link = hotel_maps if hotel_maps else f"https://www.google.com/maps/search/?api=1&query={hotel.replace(' ', '+')}"
         html += f'''
             <div class="info-block hotel-block">
                 <h4><i class="fa-solid fa-bed"></i> מקום לינה: {hotel}</h4>
