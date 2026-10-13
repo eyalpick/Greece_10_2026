@@ -144,14 +144,14 @@ const itineraryData = [
             "nameEn": "Spa Resort (Vrachati/Loutraki)",
             "desc": "לילה ראשון בריזורט יוקרתי (למשל Alkyon או Wyndham) בתקציב כ-100-120 אירו ללילה",
             "bookingUrl": "",
-            "mapsUrl": ""
+            "mapsUrl": "https://www.google.com/maps/search/?api=1&query=Vrachati+Corinthia+Hotels"
         },
         "eatsHe": "אוכל והצטיידות",
         "eatsDesc": "ארוחה קלה באזור נמאה (13:00) ובערב במסעדת המלון או טברנה קרובה",
         "activities": [
             {
-                "title": "נמאה (יקב בוטיק) והגעה לריזורט",
-                "desc": "09:00 יציאה מלגקאדיה. ב-11:30 עצירה באזור נמאה לסיור מודרך וטעימות ביקב <strong>Ktima Palivou, Nemea</strong> (יקב פאליבו).<br><a href=\"https://www.google.com/maps/search/?api=1&query=Ktima+Palivou,+Nemea\" target=\"_blank\" class=\"btn\" style=\"background:rgba(249,115,22,0.2); border:1px solid var(--accent-orange); color:#fff; font-size:0.95rem; margin-top:8px; display:inline-block;\"><i class=\"fa-solid fa-map-pin\" style=\"color:var(--accent-orange);\"></i> נווט ל-Ktima Palivou ב-Google Maps</a><br><br>סביב 15:30 הגעה למלון למנוחה ורחצה בבריכות המחוממות."
+                "title": "הרים ← יין ← מנוחה",
+                "desc": "<strong>09:00:</strong> ארוחת בוקר ויציאה מ-Lagkadia.<br><a href=\"https://www.google.com/maps/search/?api=1&query=Lagkadia+Arcadia\" target=\"_blank\" class=\"btn\" style=\"background:rgba(249,115,22,0.2); border:1px solid var(--accent-orange); color:#fff; font-size:0.95rem; margin:6px 0; display:inline-block;\"><i class=\"fa-solid fa-map-pin\" style=\"color:var(--accent-orange);\"></i> Lagkadia ב-Google Maps</a><br><br><strong>11:30–13:00:</strong> סיור וטעימות ביקב באזור נמאה (Semeli / Skouras / Palivou). האזור מכונה \"טוסקנה של יוון\", והיקבים מציעים חוויה יוקרתית מול נוף כרמים מהמם.<br><div style=\"display:flex; flex-wrap:wrap; gap:8px; margin:8px 0;\"><a href=\"https://www.google.com/maps/search/?api=1&query=Ktima+Palivou+Nemea\" target=\"_blank\" class=\"btn\" style=\"background:rgba(249,115,22,0.2); border:1px solid var(--accent-orange); color:#fff; font-size:0.95rem;\"><i class=\"fa-solid fa-wine-glass\" style=\"color:var(--accent-orange);\"></i> יקב Ktima Palivou</a><a href=\"https://www.google.com/maps/search/?api=1&query=Semeli+Estate+Nemea\" target=\"_blank\" class=\"btn\" style=\"background:rgba(249,115,22,0.2); border:1px solid var(--accent-orange); color:#fff; font-size:0.95rem;\"><i class=\"fa-solid fa-wine-glass\" style=\"color:var(--accent-orange);\"></i> יקב Semeli Estate</a><a href=\"https://www.google.com/maps/search/?api=1&query=Domaine+Skouras+Malandreni\" target=\"_blank\" class=\"btn\" style=\"background:rgba(249,115,22,0.2); border:1px solid var(--accent-orange); color:#fff; font-size:0.95rem;\"><i class=\"fa-solid fa-wine-glass\" style=\"color:var(--accent-orange);\"></i> יקב Domaine Skouras</a></div><br><strong>13:00–14:00:</strong> ארוחת צהריים קלה באזור היקב.<br><br><strong>15:00–15:30:</strong> הגעה למלון (Vrachati / לוטראקי).<br><br><strong>אחה\"צ/ערב:</strong> מנוחה במתקני המלון וטברנה בערב."
             }
         ]
     },
@@ -167,14 +167,14 @@ const itineraryData = [
             "nameEn": "Spa Resort (Vrachati/Loutraki)",
             "desc": "לילה שני באותו ריזורט",
             "bookingUrl": "",
-            "mapsUrl": ""
+            "mapsUrl": "https://www.google.com/maps/search/?api=1&query=Vrachati+Corinthia+Hotels"
         },
         "eatsHe": "אוכל והצטיידות",
         "eatsDesc": "צהריים (12:30) באזור קורינתוס, ובערב טברנת דגים על החוף",
         "activities": [
             {
-                "title": "היסטוריה מוקדמת ותצפיות",
-                "desc": "מתחילים מוקדם! 09:00 בקורינתוס העתיקה (Ancient Corinth). ב-10:30 עולים למבצר אקרוקורינתוס (שימו לב שהוא נסגר ב-15:30). אחרי הצהריים (14:30) טיפוס למנזר אוסיוס פטאפיוס (Osios Patapios) לתצפית היפה ביותר בפלופונס. 16:00 חזרה למנוחה במלון."
+                "title": "קורינתוס ותצפיות",
+                "desc": "<strong>09:00:</strong> פותחים את הבוקר באתר קורינתוס העתיקה (Ancient Corinth). עיר-מדינה שהייתה עצומה ועשירה בעת העתיקה, עם חורבות מרשימות ומקדש אפולו ענק שכיף להסתובב בו.<br><a href=\"https://www.google.com/maps/search/?api=1&query=Archaeological+Site+of+Ancient+Corinth\" target=\"_blank\" class=\"btn\" style=\"background:rgba(249,115,22,0.2); border:1px solid var(--accent-orange); color:#fff; font-size:0.95rem; margin:6px 0; display:inline-block;\"><i class=\"fa-solid fa-landmark\" style=\"color:var(--accent-orange);\"></i> קורינתוס העתיקה (Ancient Corinth) ב-Google Maps</a><br><br><strong>10:30:</strong> טיפוס למבצר Acrocorinth (מגיעים לפני הסגירה המוקדמת ב-15:30). מצודה היסטורית על סלע מונוליתי עצום, המספקת תצפית פנורמית של 360 מעלות ועוצרת נשימה.<br><a href=\"https://www.google.com/maps/search/?api=1&query=Acrocorinth+Corinth\" target=\"_blank\" class=\"btn\" style=\"background:rgba(249,115,22,0.2); border:1px solid var(--accent-orange); color:#fff; font-size:0.95rem; margin:6px 0; display:inline-block;\"><i class=\"fa-solid fa-fort-awesome\" style=\"color:var(--accent-orange);\"></i> מבצר אקרוקורינתוס (Acrocorinth) ב-Google Maps</a><br><br><strong>12:30–13:30:</strong> ארוחת צהריים באזור.<br><br><strong>14:30–15:30:</strong> נסיעה למנזר Osios Patapios. מנזר פעיל שתלוי על צוקים תלולים, עם מרפסת שצופה מגובה רב על כל מפרץ קורינתוס (מטפסים כ-150 מדרגות לתצפית).<br><a href=\"https://www.google.com/maps/search/?api=1&query=Monastery+of+Hosios+Patapios+Loutraki\" target=\"_blank\" class=\"btn\" style=\"background:rgba(249,115,22,0.2); border:1px solid var(--accent-orange); color:#fff; font-size:0.95rem; margin:6px 0; display:inline-block;\"><i class=\"fa-solid fa-place-of-worship\" style=\"color:var(--accent-orange);\"></i> מנזר אוסיוס פטאפיוס (Osios Patapios) ב-Google Maps</a><br><br><strong>16:00 ואילך:</strong> חזרה למלון למנוחה."
             }
         ]
     },
@@ -196,8 +196,8 @@ const itineraryData = [
         "eatsDesc": "עצירות ספונטניות לאורך הריביירה. ארוחת ערב מאוחרת באזור סוניון/לבריו",
         "activities": [
             {
-                "title": "רוד-טריפ שקיעה מושלם",
-                "desc": "יוצאים מוקדם ב-08:30-09:00. 09:30 תעלת קורינתוס. משם נסיעה איטית לאורך הריביירה האתונאית עם עצירות ספונטניות עד יעד הגעה של 16:00-17:30 לכף סוניון (מקדש פוסידון). צפייה בשקיעה המפורסמת ונסיעה של שעה ורבע עד שעה וחצי צפונה למלון בשדה התעופה."
+                "title": "הריביירה היוונית ושקיעה בסוניון",
+                "desc": "<strong>08:30–09:00:</strong> יציאה מהמלון.<br><br><strong>09:30–10:00:</strong> עצירה בתעלת קורינתוס. פלא הנדסי - תעלה צרה ומרשימה שחצובה 80 מטר לעומק בסלע מוצק ומחברת בין שני ימים.<br><a href=\"https://www.google.com/maps/search/?api=1&query=Corinth+Canal+Viewpoint\" target=\"_blank\" class=\"btn\" style=\"background:rgba(249,115,22,0.2); border:1px solid var(--accent-orange); color:#fff; font-size:0.95rem; margin:6px 0; display:inline-block;\"><i class=\"fa-solid fa-water\" style=\"color:var(--accent-orange);\"></i> תעלת קורינתוס (Corinth Canal) ב-Google Maps</a><br><br><strong>10:00–16:00:</strong> נסיעה על כביש \"הריביירה האתונאית\". במקום כביש מהיר משעמם, נעשה רוד-טריפ ציורי לאורך רצועת החוף הדרומית של אתונה. ניסע דרך עיירות חוף יוקרתיות ונמנע מפקקי העיר, עם עצירות ספונטניות לקפה וצהריים.<br><br><strong>16:00–17:30 (משוער):</strong> הגעה לכף סוניון ולמקדש פוסידון. מקדש עתיק שניצב בצורה דרמטית על קצה צוק מעל הים האגאי הפתוח.<br><a href=\"https://www.google.com/maps/search/?api=1&query=Temple+of+Poseidon+Cape+Sounion\" target=\"_blank\" class=\"btn\" style=\"background:rgba(249,115,22,0.2); border:1px solid var(--accent-orange); color:#fff; font-size:0.95rem; margin:6px 0; display:inline-block;\"><i class=\"fa-solid fa-monument\" style=\"color:var(--accent-orange);\"></i> מקדש פוסידון - כף סוניון (Temple of Poseidon) ב-Google Maps</a><br><br><strong>18:00 (שקיעה):</strong> תצפית שקיעה במקדש. נחשב למיקום היפה ביותר ביוון לשקיעות – רגע סיום מושלם ומרגש לטיול.<br><br><strong>אחרי השקיעה:</strong> ארוחה קלה וספונטנית באזור סוניון/לבריו (בלי התחייבות להזמנה מראש).<br><br><strong>סביב 20:00:</strong> יציאה לכיוון שדה התעופה (נסיעה של כשעה וחצי) והגעה למלון רק כדי לישון.<br><a href=\"https://www.google.com/maps/search/?api=1&query=Athens+International+Airport\" target=\"_blank\" class=\"btn\" style=\"background:rgba(249,115,22,0.2); border:1px solid var(--accent-orange); color:#fff; font-size:0.95rem; margin:6px 0; display:inline-block;\"><i class=\"fa-solid fa-plane-arrival\" style=\"color:var(--accent-orange);\"></i> אזור שדה התעופה אתונה (Athens Airport) ב-Google Maps</a>"
             }
         ]
     },
@@ -214,7 +214,7 @@ const itineraryData = [
         "activities": [
             {
                 "title": "חוזרים הביתה",
-                "desc": "קימה קלה, הגעה לשדה התעופה בסביבות 08:30 לקראת טיסת הבוקר לישראל. החזרת הרכב וטיסה נעימה!"
+                "desc": "<strong>08:30:</strong> הגעה לשדה התעופה של אתונה, החזרת הרכב וצ'ק-אין.<br><a href=\"https://www.google.com/maps/search/?api=1&query=Athens+International+Airport\" target=\"_blank\" class=\"btn\" style=\"background:rgba(249,115,22,0.2); border:1px solid var(--accent-orange); color:#fff; font-size:0.95rem; margin:6px 0; display:inline-block;\"><i class=\"fa-solid fa-plane-departure\" style=\"color:var(--accent-orange);\"></i> שדה התעופה אתונה (Athens Airport) ב-Google Maps</a><br><br><strong>11:10:</strong> טיסה חזרה לישראל!"
             }
         ]
     }

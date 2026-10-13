@@ -1,6 +1,7 @@
 import json
 import codecs
 import re
+import urllib.parse
 from guide_text import GUIDE_TEXT
 
 # Default static fallback
@@ -338,10 +339,12 @@ for day in df:
     
     hotel_info = day.get("lodging")
     hotel = ""
+    hotel_en = ""
     hotel_notes = ""
     hotel_maps = ""
     if hotel_info:
         hotel = hotel_info.get("nameHe", "")
+        hotel_en = hotel_info.get("nameEn", "")
         hotel_notes = hotel_info.get("desc", "")
         hotel_maps = hotel_info.get("mapsUrl", "")
     
@@ -416,7 +419,8 @@ for day in df:
         '''
         
     if hotel:
-        maps_link = hotel_maps if hotel_maps else f"https://www.google.com/maps/search/?api=1&query={hotel.replace(' ', '+')}"
+        query_val = hotel_en if hotel_en else hotel
+        maps_link = hotel_maps if hotel_maps else f"https://www.google.com/maps/search/?api=1&query={urllib.parse.quote_plus(query_val)}"
         html += f'''
             <div class="info-block hotel-block">
                 <h4><i class="fa-solid fa-bed"></i> מקום לינה: {hotel}</h4>
