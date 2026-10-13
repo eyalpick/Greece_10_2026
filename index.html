@@ -784,14 +784,17 @@
 
     function getSmartFocus(dayNum, w) {
         let focus = [];
-        const isRealRain = (w.rainSum >= 1.0);
+        const dayRain = Math.round(((w.morningSum || 0) + (w.noonSum || 0)) * 10) / 10;
+        const isNightOnlyRain = (w.nightSum >= 1.0 && dayRain < 0.5);
         
-        if (isRealRain && w.rainSum > 4 && w.rainProb > 60) {
-            focus.push("☔ יום גשום לפניכם! חובה לקחת מעיל גשם אטום וכיסוי לתיק.");
-        } else if (isRealRain && w.rainSum >= 2) {
-            focus.push('🌦️ ייתכנו ממטרים פזורים (מעל 2 מ"מ). כדאי להשאיר את ציוד הגשם זמין בחלק העליון של התיק.');
-        } else if (isRealRain) {
-            focus.push("☁️ ייתכן גשם מקומי קל. מומלץ להחזיק מעיל גשם זמין.");
+        if (isNightOnlyRain) {
+            focus.push("🌙 הגשם צפוי בלילה בלבד. שעות ההליכה צפויות להיות יבשות ונוחות.");
+        } else if (dayRain > 4 && (w.morningProb > 60 || w.noonProb > 60)) {
+            focus.push("☔ יום גשום בשעות ההליכה! חובה לקחת מעיל גשם אטום וכיסוי לתיק.");
+        } else if (dayRain >= 1.5) {
+            focus.push('🌦️ ייתכנו ממטרים פזורים בשעות ההליכה. כדאי להשאיר ציוד גשם נגיש בראש התרמיל.');
+        } else if (dayRain >= 0.5) {
+            focus.push("☁️ ייתכן טפטוף חולף קל במהלך היום. הליכה רגילה עם שכבות.");
         }
         
         if (w.wind > 35) {
@@ -803,10 +806,12 @@
             focus.push("יום חם. להקפיד על שתייה מרובה וקרם הגנה.");
         }
 
-        // Trail specific rules based on day_num - only trigger if real rain >= 1.0mm
+        // Trail specific rules based on day_num
         // dayNum 2 = 14.10 (Stemnitsa -> Dimitsana)
-        if (dayNum === 2 && isRealRain) {
-            focus.push("<br>⚠️ <strong>דגש בטיחות למקטע:</strong> סלעים ומדרגות חלקות בקניון לוסיוס (Lousios) בעת רטיבות! נדרשת הליכה זהירה מאוד.");
+        if (dayNum === 2) {
+            if (isNightOnlyRain || dayRain >= 0.5) {
+                focus.push("<br>⚠️ <strong>דגש בטיחות למקטע:</strong> סלעים ומדרגות בקניון לוסיוס (Lousios) עלולים להיות רטובים וחלקים! נדרשת הליכה זהירה עם מקלות הליכה.");
+            }
         }
         // dayNum 3 = 15.10 (Dimitsana/Zygovisti -> Elati)
         if (dayNum === 3 && (w.wind > 20 || w.maxT < 15)) {
@@ -831,15 +836,28 @@
                 el.querySelector('.w-summary').innerHTML = `<strong>מזג אוויר:</strong> ${w.summary}`;
                 el.querySelector('.w-temp').innerHTML = `<strong>טמפרטורות:</strong> ביום ${w.maxT}°C | בלילה ${w.minT}°C`;
                 
+                const dayRain = Math.round(((w.morningSum || 0) + (w.noonSum || 0)) * 10) / 10;
+                const hasNightRain = (w.nightSum && w.nightSum >= 0.5);
+
+                const mornText = (w.morningSum && w.morningSum >= 0.5) ? `${w.morningProb}% (${w.morningSum} מ"מ)` : (w.morningProb > 20 ? `${w.morningProb}% (יבש/טפטוף זניח)` : `0% (יבש)`);
+                const noonText = (w.noonSum && w.noonSum >= 0.5) ? `${w.noonProb}% (${w.noonSum} מ"מ)` : (w.noonProb > 20 ? `${w.noonProb}% (יבש/טפטוף זניח)` : `0% (יבש)`);
+
+                let subParts = [];
+                subParts.push(`בוקר (06-12): ${mornText}`);
+                subParts.push(`צהריים (12-18): ${noonText}`);
+                if (hasNightRain) {
+                    subParts.push(`לילה (00-06): ${w.nightSum} מ"מ`);
+                }
+
+                const subStr = `<br><span style="font-size:0.9rem; color:var(--text-muted);">${subParts.join(' | ')}</span>`;
                 let rainDisplay = '';
-                if (w.rainSum < 1.0) {
-                    rainDisplay = `<strong>סיכוי למשקעים:</strong> 0% <span style="font-size:0.9rem; color:var(--accent-green); font-weight:500;">(יבש, מתחת ל-1 מ"מ)</span>`;
+
+                if (dayRain === 0 && !hasNightRain) {
+                    rainDisplay = `<strong>סיכוי למשקעים:</strong> 0% <span style="font-size:0.9rem; color:var(--accent-green); font-weight:500;">(יבש לחלוטין)</span>${subStr}`;
+                } else if (dayRain === 0 && hasNightRain) {
+                    rainDisplay = `<strong>סיכוי למשקעים:</strong> יבש בהליכה <span style="font-size:0.9rem; color:var(--accent-green); font-weight:500;">(גשם בלילה בלבד: ${w.nightSum} מ"מ)</span>${subStr}`;
                 } else {
-                    let subText = [];
-                    if (w.morningSum >= 0.5) subText.push(`בוקר (06-12): ${w.morningProb}% (${w.morningSum} מ"מ)`);
-                    if (w.noonSum >= 0.5) subText.push(`צהריים (12-18): ${w.noonProb}% (${w.noonSum} מ"מ)`);
-                    const subStr = subText.length > 0 ? `<br><span style="font-size:0.9rem; color:var(--text-muted);">${subText.join(' | ')}</span>` : '';
-                    rainDisplay = `<strong>סיכוי למשקעים:</strong> ${w.rainProb}% (${w.rainSum} מ"מ)${subStr}`;
+                    rainDisplay = `<strong>סיכוי למשקעים:</strong> ${w.rainProb}% (${w.rainSum} מ"מ סה"כ)${subStr}`;
                 }
                 el.querySelector('.w-rain').innerHTML = rainDisplay;
                 
@@ -892,6 +910,7 @@
                 
                 let morningProb = 0; let morningSum = 0;
                 let noonProb = 0; let noonSum = 0;
+                let nightProb = 0; let nightSum = 0;
                 
                 if (data.hourly) {
                     for(let h=0; h<data.hourly.time.length; h++) {
@@ -901,7 +920,10 @@
                             const hProb = data.hourly.precipitation_probability[h] || 0;
                             const hSum = data.hourly.precipitation[h] || 0;
                             
-                            if (hour >= 6 && hour <= 11) {
+                            if (hour >= 0 && hour <= 5) {
+                                nightProb = Math.max(nightProb, hProb);
+                                nightSum += hSum;
+                            } else if (hour >= 6 && hour <= 11) {
                                 morningProb = Math.max(morningProb, hProb);
                                 morningSum += hSum;
                             } else if (hour >= 12 && hour <= 17) {
@@ -910,28 +932,30 @@
                             }
                         }
                     }
+                    nightSum = Math.round(nightSum * 10) / 10;
                     morningSum = Math.round(morningSum * 10) / 10;
                     noonSum = Math.round(noonSum * 10) / 10;
-                    
-                    if (morningSum < 0.5) { morningProb = 0; morningSum = 0; }
-                    if (noonSum < 0.5) { noonProb = 0; noonSum = 0; }
                 }
 
                 let summary = "שמשי ויבש, תנאים נוחים";
                 if(code >= 1 && code <= 3) summary = "עננות חלקית, שילוב של שמש ועננים";
                 if(code >= 45 && code <= 48) summary = "ערפילי (בעיקר בבוקר)";
                 
-                if (rainSum >= 1.0) {
-                    if (rainProb > 60 && rainSum > 4) {
-                        summary = "גשם משמעותי / רציף";
+                const dayRain = Math.round((morningSum + noonSum) * 10) / 10;
+                
+                if (dayRain >= 1.0) {
+                    if (dayRain > 4 && (morningProb > 60 || noonProb > 60)) {
+                        summary = "גשם משמעותי / רציף בשעות ההליכה";
                     } else {
-                        summary = "גשם מקומי / ממטרים פזורים";
+                        summary = "גשם מקומי / ממטרים פזורים בשעות ההליכה";
                     }
-                } else if (code >= 51) {
+                } else if (nightSum >= 1.0) {
+                    summary = "יבש בשעות ההליכה (גשם בלילה בלבד)";
+                } else if (code >= 51 || dayRain > 0) {
                     summary = "מעונן / יבש (ייתכן טפטוף חולף שאינו מורגש)";
                 }
                 
-                weatherMap[`${day}.${month}`] = { maxT, minT, rainProb, rainSum, wind, summary, morningProb, morningSum, noonProb, noonSum };
+                weatherMap[`${day}.${month}`] = { maxT, minT, rainProb, rainSum, wind, summary, morningProb, morningSum, noonProb, noonSum, nightProb, nightSum };
             }
 
             const now = new Date().getTime();
